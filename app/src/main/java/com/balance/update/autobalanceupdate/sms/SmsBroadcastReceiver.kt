@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.provider.Telephony
 import com.balance.update.autobalanceupdate.extension.logd
-import com.balance.update.autobalanceupdate.extension.toast
+import com.balance.update.autobalanceupdate.extension.toastUI
 
 class SmsBroadcastReceiver : BroadcastReceiver() {
 
@@ -14,6 +14,7 @@ class SmsBroadcastReceiver : BroadcastReceiver() {
     }
 
     override fun onReceive(context: Context, intent: Intent?) {
+        toastUI(context, "onReceive")
         if (intent?.action.equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
 
             val smsServiceIntent = Intent(context, SmsParserService::class.java)

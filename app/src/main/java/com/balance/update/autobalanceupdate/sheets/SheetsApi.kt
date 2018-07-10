@@ -8,32 +8,37 @@ import com.google.api.services.sheets.v4.model.UpdateValuesResponse
 import com.google.api.services.sheets.v4.model.ValueRange
 
 
-class SheetsApi {
+class SheetsApi(credential: GoogleAccountCredential) {
 
-    companion object {
-        const val HALVA_CELL = "C6"
-        const val PRIOR_CELL = "C5"
-        const val BALANCE_SPREADSHEET = "15NfMZvT2qDM8Xja1GnqumkNd8sIEgDM2XbMNaWkJocQ"
-        const val BALANCE_SHEET = "Sheet_1"
+    private val sheets = Sheets.Builder(AndroidHttp.newCompatibleTransport(),
+            JacksonFactory.getDefaultInstance(),
+            credential)
+            .setApplicationName("Auto Update")
+            .build()
+
+    private val service = sheets.spreadsheets().values()
+
+    private lateinit var sheetName: String
+    private lateinit var spreadsheetId: String
+
+    fun selectSpreadsheetId(spreadsheetId: String): SheetsApi {
+        this.spreadsheetId = spreadsheetId
+
+        return this
     }
 
-    fun updateSheet(credential: GoogleAccountCredential, halvaValue: Double): UpdateValuesResponse? {
-        val sheets = Sheets.Builder(AndroidHttp.newCompatibleTransport(),
-                JacksonFactory.getDefaultInstance(),
-                credential)
-                .setApplicationName("Auto Update")
-                .build()
+    fun selectSheet(sheetName: String): SheetsApi {
+        this.sheetName = sheetName
 
-        val service = sheets.spreadsheets().values()
+        return this
+    }
 
-        val values = listOf(
-                listOf(halvaValue)
-        )
+    fun updateCell(targetCell: String, targetValue: Any): UpdateValuesResponse {
+        val values = listOf(listOf(targetValue))
 
-        val body = ValueRange()
-                .setValues(values)
+        val body = ValueRange().setValues(values)
 
-        return service.update(BALANCE_SPREADSHEET, "$BALANCE_SHEET!$HALVA_CELL", body)
+        return service.update(spreadsheetId, "$sheetName!$targetCell", body)
                 .setValueInputOption("RAW")
                 .execute()
     }

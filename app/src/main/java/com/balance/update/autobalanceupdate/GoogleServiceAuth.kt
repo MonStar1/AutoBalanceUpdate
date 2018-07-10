@@ -5,6 +5,7 @@ import android.content.Intent
 import com.balance.update.autobalanceupdate.extension.loge
 import com.balance.update.autobalanceupdate.extension.toast
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -47,7 +48,7 @@ class GoogleServiceAuth(val activity: Activity, val listener : GoogleServiceAuth
 
                 toast(activity, "account: ${account.displayName}")
 
-                listener.signedIn()
+                listener.signedIn(account)
             } catch (ex: ApiException) {
                 loge(ex)
                 toast(activity, "statusCode: ${ex.statusCode}")
@@ -57,5 +58,5 @@ class GoogleServiceAuth(val activity: Activity, val listener : GoogleServiceAuth
 }
 
 interface GoogleServiceAuthListener {
-    fun signedIn()
+    fun signedIn(account: GoogleSignInAccount)
 }

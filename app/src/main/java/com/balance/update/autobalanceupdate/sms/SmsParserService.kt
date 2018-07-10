@@ -8,12 +8,21 @@ import android.provider.Telephony
 import com.balance.update.autobalanceupdate.GoogleServiceAuth
 import com.balance.update.autobalanceupdate.extension.logd
 import com.balance.update.autobalanceupdate.extension.toast
+import com.balance.update.autobalanceupdate.extension.toastUI
 import com.balance.update.autobalanceupdate.sheets.SheetsApi
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.util.ExponentialBackOff
+import com.google.api.services.sheets.v4.model.UpdateValuesResponse
 
 class SmsParserService : IntentService("SmsService") {
+
+    companion object {
+        const val HALVA_BALANCE_CELL = "C6"
+        const val PRIOR_BALANCE_CELL = "C5"
+        const val BALANCE_SPREADSHEET = "15NfMZvT2qDM8Xja1GnqumkNd8sIEgDM2XbMNaWkJocQ"
+        const val BALANCE_SHEET = "Sheet_1"
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -30,25 +39,14 @@ class SmsParserService : IntentService("SmsService") {
 
     override fun onHandleIntent(intent: Intent) {
         Telephony.Sms.Intents.getMessagesFromIntent(intent).forEach {
-
-            if (handleNumber(it.originatingAddress)) {
-                handleMessage(it.messageBody)
-            }
+            handleMessage(it.originatingAddress, it.messageBody)
         }
 
-        logd("service onHandleIntent")
+        toastUI(this, "service onHandleIntent")
     }
 
-    private fun handleMessage(messageBody: String?) {
-        logd("message: $messageBody")
-
-        val ostatok = "OSTATOK "
-        val byn = " BYN"
-
-        val lastIndexOfOstatok = messageBody?.lastIndexOf(ostatok)!! + ostatok.length
-        val lastIndexOfByn = messageBody?.lastIndexOf(byn)
-
-        val halvaValue = messageBody.substring(lastIndexOfOstatok..lastIndexOfByn).toDouble()
+    private fun handleMessage(sender: String, messageBody: String) {
+        toastUI(this, "message: $messageBody")
 
         val googleAccountCredential = GoogleAccountCredential
                 .usingOAuth2(this, GoogleServiceAuth.SCOPES)
@@ -56,20 +54,29 @@ class SmsParserService : IntentService("SmsService") {
 
         googleAccountCredential?.selectedAccount = GoogleSignIn.getLastSignedInAccount(this)?.account
 
-        val result = SheetsApi().updateSheet(googleAccountCredential, halvaValue)
+        val smsData: SmsData
 
-        if (result != null) {
-            val mainHandler = Handler(Looper.getMainLooper())
-
-            mainHandler.post(Runnable {
-                // Do your stuff here related to UI, e.g. show toast
-                toast(this, "result: ${result.updatedRows}")
-            })
+        try {
+            smsData = SmsParserFactory(sender, messageBody).getParser().parse()
+        } catch (ex: SmsParseException) {
+            toastUI(this, "Unknown sms type: $messageBody")
+            return
         }
-    }
 
-    private fun handleNumber(originatingAddress: String?): Boolean {
-        return originatingAddress?.contains("MTBANK", ignoreCase = true) ?: false
+
+        val sheetsApi = SheetsApi(googleAccountCredential).apply {
+            selectSpreadsheetId(BALANCE_SPREADSHEET)
+            selectSheet(BALANCE_SHEET)
+        }
+
+        val result: UpdateValuesResponse
+
+        result = when (smsData.sender) {
+            is SmsSender.Mtbank -> sheetsApi.updateCell(HALVA_BALANCE_CELL, smsData.actualBalance)
+            is SmsSender.PriorBank -> sheetsApi.updateCell(PRIOR_BALANCE_CELL, smsData.actualBalance)
+        }
+
+        toastUI(this, "updated: ${result.updatedRows}")
     }
 
 }
