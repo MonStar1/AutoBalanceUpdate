@@ -10,32 +10,22 @@ class MtbankSmsParser(val body: String) : SmsParser {
     }
 
     private fun getSpent(): Double {
-        val prefix = "OPLATA"
-        val postfix = "BYN"
+        val matcher = buildPattern("OPLATA", "BYN").matcher(body)
 
-        val indexOfOplata = body.indexOf(prefix)
-
-        if (!body.contains(prefix, ignoreCase = true) || !body.contains(postfix, ignoreCase = true)) {
+        if (matcher.matches()) {
+            return matcher.group(1).toDouble()
+        } else {
             return 0.0
         }
-
-        val lastIndexOfOstatok = indexOfOplata + prefix.length
-        val lastIndexOfByn = body.indexOf(postfix)
-
-        return body.substring(lastIndexOfOstatok until lastIndexOfByn).toDouble()
     }
 
     private fun getActualBalance(): Double {
-        val prefix = "OSTATOK"
-        val postfix = "BYN"
+        val matcher = buildPattern("OSTATOK", "BYN").matcher(body)
 
-        if (!body.contains(prefix, ignoreCase = true) || !body.contains(postfix, ignoreCase = true)) {
-            throw SmsParseException()
+        if (matcher.matches()) {
+            return matcher.group(1).toDouble()
+        } else {
+            throw SmsParseException("Unknown MTBank sms type")
         }
-
-        val lastIndexOfOstatok = body.lastIndexOf(prefix) + prefix.length
-        val lastIndexOfByn = body.lastIndexOf(postfix)
-
-        return body.substring(lastIndexOfOstatok until lastIndexOfByn).toDouble()
     }
 }

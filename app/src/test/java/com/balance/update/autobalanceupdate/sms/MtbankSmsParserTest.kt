@@ -14,16 +14,17 @@ class MtbankSmsParserTest {
 
         val result = parser.parse()
 
-        assertEquals(10.0, result.spent, 0.0)
         assertEquals(100.0, result.actualBalance, 0.0)
+        assertEquals(10.0, result.spent, 0.0)
     }
 
     @Test
     fun parse_2() {
-        parser = MtbankSmsParser("OSTATOK 100.99BYN")
+        parser = MtbankSmsParser("OPLATA 10.1 BYN OSTATOK 100.99BYN")
 
         val result = parser.parse()
 
+        assertEquals(10.1, result.spent, 0.0)
         assertEquals(100.99, result.actualBalance, 0.0)
     }
 
@@ -45,12 +46,19 @@ class MtbankSmsParserTest {
         assertEquals(100.1, result.actualBalance, 0.0)
     }
 
-    @Test
+    @Test(expected = SmsParseException::class)
     fun parse_5() {
         parser = MtbankSmsParser("Other text")
 
         val result = parser.parse()
+    }
 
-        assertEquals(0.0, result.actualBalance, 0.0)
+    @Test
+    fun parse_6() {
+        parser = MtbankSmsParser("OSTATOK 1 BYN")
+
+        val result = parser.parse()
+
+        assertEquals(1.0, result.actualBalance, 0.0)
     }
 }

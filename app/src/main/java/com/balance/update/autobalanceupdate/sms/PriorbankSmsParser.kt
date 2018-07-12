@@ -7,16 +7,12 @@ class PriorbankSmsParser(val body: String) : SmsParser {
     }
 
     private fun getActualBalance(): Double {
-        val prefix = "Dostupno:"
-        val postfix = "BYN"
+        val matcher = buildPattern("Dostupno:", "BYN").matcher(body)
 
-        if (!body.contains(prefix, ignoreCase = true) || !body.contains(postfix, ignoreCase = true)) {
-            throw SmsParseException()
+        if (matcher.matches()) {
+            return matcher.group(1).toDouble()
+        } else {
+            throw SmsParseException("Unknown Priorbank sms type")
         }
-
-        val lastIndexOfOstatok = body.lastIndexOf(prefix) + prefix.length
-        val lastIndexOfByn = body.lastIndexOf(postfix)
-
-        return body.substring(lastIndexOfOstatok until lastIndexOfByn).toDouble()
     }
 }

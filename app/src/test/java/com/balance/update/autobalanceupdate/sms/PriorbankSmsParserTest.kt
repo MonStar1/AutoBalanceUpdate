@@ -44,12 +44,10 @@ class PriorbankSmsParserTest {
         assertEquals(100.1, result.actualBalance, 0.0)
     }
 
-    @Test
+    @Test(expected = SmsParseException::class)
     fun parse_5() {
         parser = PriorbankSmsParser("Other text")
 
         val result = parser.parse()
-
-        assertEquals(0.0, result.actualBalance, 0.0)
     }
 }
