@@ -1,13 +1,16 @@
 package com.balance.update.autobalanceupdate.sms
 
+import com.balance.update.autobalanceupdate.sms.parser.*
+
 class SmsParserFactory(val from: String, val body: String) {
 
     private fun getSender(): SmsSender {
         return when (from) {
             SmsSender.Mtbank().name -> SmsSender.Mtbank()
             SmsSender.PriorBank().name -> SmsSender.PriorBank()
+            SmsSender.Test().name -> SmsSender.Test()
             else -> {
-                throw IllegalStateException("Unknown SMS sender")
+                throw SmsSenderException("Unknown SMS sender")
             }
         }
     }
@@ -16,6 +19,7 @@ class SmsParserFactory(val from: String, val body: String) {
         return when (getSender()) {
             is SmsSender.Mtbank -> MtbankSmsParser(body)
             is SmsSender.PriorBank -> PriorbankSmsParser(body)
+            is SmsSender.Test -> TestSmsParser(body)
         }
     }
 }

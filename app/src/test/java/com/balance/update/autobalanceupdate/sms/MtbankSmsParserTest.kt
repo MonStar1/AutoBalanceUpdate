@@ -1,5 +1,7 @@
 package com.balance.update.autobalanceupdate.sms
 
+import com.balance.update.autobalanceupdate.sms.parser.MtbankSmsParser
+import com.balance.update.autobalanceupdate.sms.parser.SmsParseException
 import org.junit.Test
 
 import org.junit.Assert.*

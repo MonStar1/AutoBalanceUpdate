@@ -14,7 +14,6 @@ class SmsBroadcastReceiver : BroadcastReceiver() {
     }
 
     override fun onReceive(context: Context, intent: Intent?) {
-        toastUI(context, "onReceive")
         if (intent?.action.equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
 
             val smsServiceIntent = Intent(context, SmsParserService::class.java)

@@ -42,4 +42,12 @@ class SheetsApi(credential: GoogleAccountCredential) {
                 .setValueInputOption("RAW")
                 .execute()
     }
+
+    fun readCell(targetCell: String): String {
+        val valueRange = service.get(spreadsheetId, "$sheetName!$targetCell").execute()
+
+        val toString = valueRange.getValues().get(0).get(0).toString()
+
+        return toString.replace(",", ".")
+    }
 }
