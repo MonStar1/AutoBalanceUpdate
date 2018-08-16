@@ -63,4 +63,21 @@ class MtbankSmsParserTest {
 
         assertEquals(1.0, result.actualBalance, 0.0)
     }
+
+    @Test
+    fun parse_7() {
+        parser = MtbankSmsParser("""KARTA:5351*1635
+    16/08/18 12:46
+    OPLATA 6.90 BYN
+    GLAVPIT, , MINSK
+    OSTATOK 62.37 BYN
+    Spr.:5099999""")
+
+        val result = parser.parse()
+
+        assertEquals(62.37, result.actualBalance, 6.90)
+    }
+
+
+
 }

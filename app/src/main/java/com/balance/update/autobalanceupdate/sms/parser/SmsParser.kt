@@ -9,7 +9,8 @@ interface SmsParser {
         private const val PATTERN_OSTATOK = ".*%s\\s*?(\\d+.?[\\d]*)\\s*?%s.*"
 
         fun buildPattern(prefix: String, postfix: String): Pattern {
-            return Pattern.compile(PATTERN_OSTATOK.format(prefix, postfix), Pattern.CASE_INSENSITIVE)
+            val flags = Pattern.CASE_INSENSITIVE or Pattern.DOTALL
+            return Pattern.compile(PATTERN_OSTATOK.format(prefix, postfix), flags)
         }
     }
 
