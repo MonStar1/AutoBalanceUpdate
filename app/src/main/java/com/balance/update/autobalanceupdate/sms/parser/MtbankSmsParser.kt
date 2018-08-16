@@ -39,7 +39,7 @@ class MtbankSellerParser {
 
 
     companion object {
-        val FOOD_ARRAY = arrayOf("SHOP \"SOSEDI\"", "SHOP \"KORONA\"", "SHOP \"EVROOPT\"")
+        val FOOD_ARRAY = arrayOf("SHOP \"SOSEDI\"", "SHOP \"KORONA\"", "SHOP \"EVROOPT\"", "UNIVERSAM\"ZLATOGORSKIY")
 
         fun getSeller(body: String): Seller {
             val food = buildFoodPattern()
