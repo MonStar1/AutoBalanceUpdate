@@ -39,7 +39,7 @@ class MtbankSellerParser {
 
 
     companion object {
-        val FOOD_ARRAY = arrayOf("SHOP \"SOSEDI\"", "SHOP \"KORONA\"", "SHOP \"EVROOPT\"", "UNIVERSAM\"ZLATOGORSKIY")
+        val FOOD_ARRAY = arrayOf("SHOP\\s\"SOSEDI\"", "SHOP\\s\"KORONA\"", "SHOP\\s\"EVROOPT\"", "UNIVERSAM\"ZLATOGORSKIY")
 
         fun getSeller(body: String): Seller {
             val food = buildFoodPattern()
@@ -52,19 +52,19 @@ class MtbankSellerParser {
         }
 
         private fun buildFoodPattern(): Pattern {
-            val str = buildString {}
+            val str = buildString {
+                append("(")
+                for ((i, food) in FOOD_ARRAY.withIndex()) {
+                    append(food)
 
-            str.plus("(")
-            for ((i, food) in FOOD_ARRAY.withIndex()) {
-                str.plus(food)
-
-                if (i != FOOD_ARRAY.size - 1) {
-                    str.plus("|")
+                    if (i != FOOD_ARRAY.size - 1) {
+                        append("|")
+                    }
                 }
+                append(")")
             }
-            str.plus(")")
 
-            return SmsParser.buildPattern("OPLATA", "BYN $str")
+            return SmsParser.buildPattern("OPLATA", "BYN\\s$str")
         }
     }
 }

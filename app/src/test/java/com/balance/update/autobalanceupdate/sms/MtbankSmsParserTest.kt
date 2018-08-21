@@ -1,7 +1,9 @@
 package com.balance.update.autobalanceupdate.sms
 
+import com.balance.update.autobalanceupdate.sms.parser.MtbankSellerParser
 import com.balance.update.autobalanceupdate.sms.parser.MtbankSmsParser
 import com.balance.update.autobalanceupdate.sms.parser.SmsParseException
+import com.balance.update.autobalanceupdate.sms.seller.Seller
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -77,7 +79,5 @@ class MtbankSmsParserTest {
 
         assertEquals(62.37, result.actualBalance, 6.90)
     }
-
-
 
 }
