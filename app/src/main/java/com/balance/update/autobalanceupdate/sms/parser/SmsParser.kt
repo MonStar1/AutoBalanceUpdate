@@ -6,11 +6,11 @@ import java.util.regex.Pattern
 
 interface SmsParser {
     companion object {
-        private const val PATTERN_OSTATOK = ".*%s\\s*?(\\d+.?[\\d]*)\\s*?%s.*"
+        private const val PATTERN_BALANCE = ".*%s\\s*?(\\d+.?[\\d]*)\\s*?%s.*"
 
         fun buildPattern(prefix: String, postfix: String): Pattern {
             val flags = Pattern.CASE_INSENSITIVE or Pattern.DOTALL
-            return Pattern.compile(PATTERN_OSTATOK.format(prefix, postfix), flags)
+            return Pattern.compile(PATTERN_BALANCE.format(prefix, postfix), flags)
         }
     }
 
