@@ -44,7 +44,7 @@ class UpdateBalanceService : JobService() {
     }
 
     override fun onStopJob(job: JobParameters?): Boolean {
-        return !jobFinished
+        return false
     }
 
     private fun handleMessage(sender: String, messageBody: String) {
