@@ -3,9 +3,14 @@ package com.balance.update.autobalanceupdate.sms
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.provider.Telephony
 import com.balance.update.autobalanceupdate.extension.logd
-import com.balance.update.autobalanceupdate.extension.toastUI
+import com.balance.update.autobalanceupdate.service.UpdateBalanceService
+import com.balance.update.autobalanceupdate.sms.model.ReceivedSmsModel
+import com.firebase.jobdispatcher.Constraint
+import com.firebase.jobdispatcher.FirebaseJobDispatcher
+import com.firebase.jobdispatcher.GooglePlayDriver
 
 class SmsBroadcastReceiver : BroadcastReceiver() {
 
@@ -15,18 +20,26 @@ class SmsBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent?) {
         if (intent?.action.equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
+            val dispatcher = FirebaseJobDispatcher(GooglePlayDriver(context))
 
-            val smsServiceIntent = Intent(context, SmsParserService::class.java)
+            Telephony.Sms.Intents.getMessagesFromIntent(intent).forEach {
+                val extras = Bundle()
 
-            smsServiceIntent.apply {
-                data = intent?.data
-                action = intent?.action
-                flags = intent?.flags!!
+                val sender = it.originatingAddress
+                val tag = "SMS $sender ${it.timestampMillis}"
 
-                replaceExtras(intent)
+                extras.putString(ReceivedSmsModel.EXTRA_SENDER, sender)
+                extras.putString(ReceivedSmsModel.EXTRA_MESSAGE, it.messageBody)
+
+                val job = dispatcher.newJobBuilder()
+                        .setService(UpdateBalanceService::class.java)
+                        .setTag(tag)
+                        .setExtras(extras)
+                        .setConstraints(Constraint.ON_ANY_NETWORK)
+                        .build()
+
+                dispatcher.mustSchedule(job)
             }
-
-            context.startService(smsServiceIntent)
         }
     }
 }

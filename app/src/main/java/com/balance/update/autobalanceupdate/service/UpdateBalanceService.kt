@@ -1,21 +1,26 @@
-package com.balance.update.autobalanceupdate.sms
+package com.balance.update.autobalanceupdate.service
 
-import android.app.IntentService
-import android.content.Intent
-import android.provider.Telephony
 import com.balance.update.autobalanceupdate.GoogleServiceAuth
 import com.balance.update.autobalanceupdate.extension.toastUI
 import com.balance.update.autobalanceupdate.sheets.SheetsApi
+import com.balance.update.autobalanceupdate.sms.SmsParserFactory
+import com.balance.update.autobalanceupdate.sms.SmsSender
+import com.balance.update.autobalanceupdate.sms.model.ReceivedSmsModel
 import com.balance.update.autobalanceupdate.sms.parser.SmsData
 import com.balance.update.autobalanceupdate.sms.parser.SmsParseException
 import com.balance.update.autobalanceupdate.sms.parser.SmsSenderException
 import com.balance.update.autobalanceupdate.sms.seller.Seller
+import com.firebase.jobdispatcher.JobParameters
+import com.firebase.jobdispatcher.JobService
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.util.ExponentialBackOff
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse
+import kotlin.concurrent.thread
 
-class SmsParserService : IntentService("SmsService") {
+class UpdateBalanceService : JobService() {
+
+    private var jobFinished = false
 
     companion object {
         const val HALVA_BALANCE_CELL = "C6"
@@ -25,11 +30,21 @@ class SmsParserService : IntentService("SmsService") {
         const val BALANCE_SHEET = "Sheet_1"
     }
 
+    override fun onStartJob(job: JobParameters?): Boolean {
+        thread {
+            val sender = job?.extras?.getString(ReceivedSmsModel.EXTRA_SENDER)!!
+            val message = job.extras?.getString(ReceivedSmsModel.EXTRA_MESSAGE)!!
 
-    override fun onHandleIntent(intent: Intent) {
-        Telephony.Sms.Intents.getMessagesFromIntent(intent).forEach {
-            handleMessage(it.originatingAddress, it.messageBody)
+            handleMessage(sender, message)
+
+            jobFinished = true
         }
+
+        return true
+    }
+
+    override fun onStopJob(job: JobParameters?): Boolean {
+        return !jobFinished
     }
 
     private fun handleMessage(sender: String, messageBody: String) {
@@ -80,5 +95,4 @@ class SmsParserService : IntentService("SmsService") {
             }
         }
     }
-
 }
