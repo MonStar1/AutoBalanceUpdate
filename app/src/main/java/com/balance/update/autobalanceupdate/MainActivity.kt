@@ -26,6 +26,11 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
 
         setContentView(R.layout.activity_main)
 
+        openBattery.setOnClickListener {
+            val intentBatteryUsage = Intent(Intent.ACTION_POWER_USAGE_SUMMARY)
+            startActivity(intentBatteryUsage)
+        }
+
         googleServiceAuth = GoogleServiceAuth(this, object : GoogleServiceAuthListener {
             override fun signedIn(account: GoogleSignInAccount) {
                 textView.setText("Name: ${account.displayName}")
