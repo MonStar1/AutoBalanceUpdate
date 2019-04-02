@@ -4,12 +4,14 @@ import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.balance.update.autobalanceupdate.db.TestData
 import com.balance.update.autobalanceupdate.extension.logd
 import com.balance.update.autobalanceupdate.extension.toast
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import kotlinx.android.synthetic.main.content_main.*
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.AppSettingsDialog
+import kotlin.concurrent.thread
 
 
 class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, EasyPermissions.RationaleCallbacks {
@@ -29,6 +31,12 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
         openBattery.setOnClickListener {
             val intentBatteryUsage = Intent(Intent.ACTION_POWER_USAGE_SUMMARY)
             startActivity(intentBatteryUsage)
+
+            thread {
+                App.db.getTestDao().insert(TestData(value = "String test"))
+
+                toast(this@MainActivity, App.db.getTestDao().loadAll().joinToString())
+            }
         }
 
         googleServiceAuth = GoogleServiceAuth(this, object : GoogleServiceAuthListener {

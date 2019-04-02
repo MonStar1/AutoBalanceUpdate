@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.provider.Telephony
 import com.balance.update.autobalanceupdate.extension.logd
-import com.balance.update.autobalanceupdate.extension.toastUI
 
 class SmsBroadcastReceiver : BroadcastReceiver() {
 

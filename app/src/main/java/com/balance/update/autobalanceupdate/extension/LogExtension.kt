@@ -6,15 +6,11 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 
-fun toast(context: Context, text: String) {
-    Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
-}
-
-fun toastUI(context: Context, text: String) {
+fun toast(context: Context, text: String, duration: Int = Toast.LENGTH_SHORT) {
     val mainHandler = Handler(Looper.getMainLooper())
 
     mainHandler.post {
-        toast(context, text)
+        Toast.makeText(context, text, duration).show()
     }
 }
 

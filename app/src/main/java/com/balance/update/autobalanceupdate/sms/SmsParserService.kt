@@ -4,7 +4,7 @@ import android.app.IntentService
 import android.content.Intent
 import android.provider.Telephony
 import com.balance.update.autobalanceupdate.GoogleServiceAuth
-import com.balance.update.autobalanceupdate.extension.toastUI
+import com.balance.update.autobalanceupdate.extension.toast
 import com.balance.update.autobalanceupdate.sheets.SheetsApi
 import com.balance.update.autobalanceupdate.sms.parser.SmsData
 import com.balance.update.autobalanceupdate.sms.parser.SmsParseException
@@ -33,7 +33,7 @@ class SmsParserService : IntentService("SmsService") {
     }
 
     private fun handleMessage(sender: String, messageBody: String) {
-        toastUI(this, "message: $messageBody")
+        toast(this, "message: $messageBody")
 
         val googleAccountCredential = GoogleAccountCredential
                 .usingOAuth2(this, GoogleServiceAuth.SCOPES)
@@ -46,10 +46,10 @@ class SmsParserService : IntentService("SmsService") {
         try {
             smsData = SmsParserFactory(sender, messageBody).getParser().parse()
         } catch (ex: SmsParseException) {
-            toastUI(this, "Unknown sms type: $messageBody")
+            toast(this, "Unknown sms type: $messageBody")
             return
         } catch (ex: SmsSenderException) {
-            toastUI(this, "Unknown sms sender: $sender")
+            toast(this, "Unknown sms sender: $sender")
             return
         }
 
@@ -69,7 +69,7 @@ class SmsParserService : IntentService("SmsService") {
             is SmsSender.Test -> result
         }
 
-        toastUI(this, "updated: ${result.updatedRows}")
+        toast(this, "updated: ${result.updatedRows}")
 
         when (smsData.seller) {
             is Seller.Food -> {
