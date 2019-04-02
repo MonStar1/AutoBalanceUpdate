@@ -3,7 +3,7 @@ package com.balance.update.autobalanceupdate
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.balance.update.autobalanceupdate.extension.logd
 import com.balance.update.autobalanceupdate.extension.toast
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
