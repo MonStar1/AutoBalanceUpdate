@@ -4,14 +4,15 @@ import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.balance.update.autobalanceupdate.db.TestData
 import com.balance.update.autobalanceupdate.extension.logd
 import com.balance.update.autobalanceupdate.extension.toast
+import com.balance.update.autobalanceupdate.filter.data.entities.Filter
+import com.balance.update.autobalanceupdate.filter.presentation.FiltersActivity
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.content_main.*
-import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.AppSettingsDialog
-import kotlin.concurrent.thread
+import pub.devrel.easypermissions.EasyPermissions
 
 
 class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, EasyPermissions.RationaleCallbacks {
@@ -23,6 +24,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
         const val RC_RECEIVE_SMS = 111
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -31,11 +33,14 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
         openBattery.setOnClickListener {
             val intentBatteryUsage = Intent(Intent.ACTION_POWER_USAGE_SUMMARY)
             startActivity(intentBatteryUsage)
+
         }
 
         googleServiceAuth = GoogleServiceAuth(this, object : GoogleServiceAuthListener {
             override fun signedIn(account: GoogleSignInAccount) {
                 textView.text = "Name: ${account.displayName}"
+
+                startActivity(Intent(this@MainActivity, FiltersActivity::class.java))
             }
         })
 

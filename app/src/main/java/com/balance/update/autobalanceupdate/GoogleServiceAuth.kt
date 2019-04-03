@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import com.balance.update.autobalanceupdate.extension.loge
 import com.balance.update.autobalanceupdate.extension.toast
+import com.balance.update.autobalanceupdate.filter.presentation.FiltersActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -12,7 +13,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.Scope
 import com.google.api.services.sheets.v4.SheetsScopes
 
-class GoogleServiceAuth(val activity: Activity, val listener : GoogleServiceAuthListener) {
+class GoogleServiceAuth(val activity: Activity, val listener: GoogleServiceAuthListener) {
 
     companion object {
         val SCOPES = listOf(SheetsScopes.SPREADSHEETS_READONLY)
