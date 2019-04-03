@@ -16,11 +16,11 @@ import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, EasyPermissions.RationaleCallbacks {
 
-    lateinit var googleServiceAuth: GoogleServiceAuth;
+    lateinit var googleServiceAuth: GoogleServiceAuth
 
     companion object {
         const val SMS_PERMISSION = Manifest.permission.RECEIVE_SMS
-        const val RC_RECEIVE_SMS = 111;
+        const val RC_RECEIVE_SMS = 111
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,17 +31,11 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
         openBattery.setOnClickListener {
             val intentBatteryUsage = Intent(Intent.ACTION_POWER_USAGE_SUMMARY)
             startActivity(intentBatteryUsage)
-
-            thread {
-                App.db.getTestDao().insert(TestData(value = "String test"))
-
-                toast(this@MainActivity, App.db.getTestDao().loadAll().joinToString())
-            }
         }
 
         googleServiceAuth = GoogleServiceAuth(this, object : GoogleServiceAuthListener {
             override fun signedIn(account: GoogleSignInAccount) {
-                textView.setText("Name: ${account.displayName}")
+                textView.text = "Name: ${account.displayName}"
             }
         })
 
@@ -51,21 +45,6 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
             requestSmsPermission()
         }
 
-//        thread {
-//            val cursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null)
-//
-//            if (cursor!!.moveToFirst()) { // must check the result to prevent exception
-//                do {
-//                    var msgData = ""
-//                    for (idx in 0 until cursor.columnCount) {
-//                        msgData += " " + cursor.getColumnName(idx) + ":" + cursor.getString(idx)
-//                    }
-//                    // use msgData
-//                } while (cursor.moveToNext())
-//            } else {
-//                // empty box, no SMS
-//            }
-//        }
     }
 
 

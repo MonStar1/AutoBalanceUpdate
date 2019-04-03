@@ -10,7 +10,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.Scope
-import com.google.android.gms.drive.Drive
 import com.google.api.services.sheets.v4.SheetsScopes
 
 class GoogleServiceAuth(val activity: Activity, val listener : GoogleServiceAuthListener) {
@@ -25,9 +24,7 @@ class GoogleServiceAuth(val activity: Activity, val listener : GoogleServiceAuth
     init {
         val signInOptions: GoogleSignInOptions =
                 GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestScopes(Scope(SheetsScopes.SPREADSHEETS_READONLY))
-                        .requestScopes(Scope(SheetsScopes.SPREADSHEETS))
-                        .requestScopes(Drive.SCOPE_FILE)
+                        .requestScopes(Scope(SheetsScopes.SPREADSHEETS_READONLY), Scope(SheetsScopes.SPREADSHEETS))
                         .requestEmail()
 //                        .requestIdToken("622957320654-02leij1hlsb155v5nout6ija8roq406t.apps.googleusercontent.com")
                         .build()
@@ -46,7 +43,7 @@ class GoogleServiceAuth(val activity: Activity, val listener : GoogleServiceAuth
             try {
                 val account = signedInAccountFromIntent.getResult(ApiException::class.java)
 
-                toast(activity, "account: ${account.displayName}")
+                toast(activity, "account: ${account!!.displayName}")
 
                 listener.signedIn(account)
             } catch (ex: ApiException) {
