@@ -14,18 +14,20 @@ class MtbankSmsParser(val body: String) : SmsParser {
         return SmsData(SmsSender.Mtbank(), seller, spent, balance)
     }
 
-    private fun getSpent(): Double {
-        val matcher = buildPattern("OPLATA", "BYN").matcher(body)
+    private fun getSpent(): Amount {
+        val matcher = buildPattern("OPLATA", Currency.getPattern()).matcher(body)
 
         if (matcher.matches()) {
-            return matcher.group(1).toDouble()
+            val currency = Currency.values().firstOrNull { it.value == matcher.group(2) }
+
+            return Amount(currency ?: Currency.BYN, matcher.group(1).toDouble())
         } else {
-            return 0.0
+            return Amount(Currency.BYN, 0.0)
         }
     }
 
     private fun getActualBalance(): Double {
-        val matcher = buildPattern("OSTATOK", "BYN").matcher(body)
+        val matcher = buildPattern("OSTATOK", Currency.BYN.value).matcher(body)
 
         if (matcher.matches()) {
             return matcher.group(1).toDouble()
@@ -39,7 +41,7 @@ class MtbankSellerParser {
 
 
     companion object {
-        val FOOD_ARRAY = arrayOf("SHOP\\s\"SOSEDI\"", "SHOP\\s\"KORONA\"", "SHOP\\s\"EVROOPT\"", "UNIVERSAM\"ZLATOGORSKIY", "\"BELMARKET\"", "\"ALMI\"", "SHOP\\sVESTA")
+        val FOOD_ARRAY = arrayOf("SHOP\\s\"SOSEDI\"", "SHOP\\s\"KORONA\"", "SHOP\\s\"EVROOPT\"", "UNIVERSAM\"ZLATOGORSKIY", "\"BELMARKET\"", "UNIVERSAM\\s\"ALMI\"", "SHOP\\sVESTA")
 
         fun getSeller(body: String): Seller {
             val food = buildFoodPattern()
@@ -64,7 +66,7 @@ class MtbankSellerParser {
                 append(")")
             }
 
-            return SmsParser.buildPattern("OPLATA", "BYN\\s$str")
+            return SmsParser.buildPattern("OPLATA", "${Currency.getPattern()}\\s$str")
         }
     }
 }

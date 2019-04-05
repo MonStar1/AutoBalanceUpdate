@@ -19,7 +19,7 @@ class MtbankSmsParserTest {
         val result = parser.parse()
 
         assertEquals(100.0, result.actualBalance, 0.0)
-        assertEquals(10.0, result.spent, 0.0)
+        assertEquals(10.0, result.spent.amount, 0.0)
     }
 
     @Test
@@ -28,7 +28,7 @@ class MtbankSmsParserTest {
 
         val result = parser.parse()
 
-        assertEquals(10.1, result.spent, 0.0)
+        assertEquals(10.1, result.spent.amount, 0.0)
         assertEquals(100.99, result.actualBalance, 0.0)
     }
 

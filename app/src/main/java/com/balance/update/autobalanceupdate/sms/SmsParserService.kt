@@ -74,7 +74,7 @@ class SmsParserService : IntentService("SmsService") {
         when (smsData.seller) {
             is Seller.Food -> {
                 val balance = sheetsApi.readCell(FOOD_CELL).toDouble()
-                val newBalance = balance - smsData.spent
+                val newBalance = balance - smsData.spent.amount
 
                 sheetsApi.updateCell(FOOD_CELL, newBalance)
             }
