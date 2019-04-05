@@ -41,7 +41,7 @@ class MtbankSellerParser {
 
 
     companion object {
-        val FOOD_ARRAY = arrayOf("SHOP\\s\"SOSEDI\"", "SHOP\\s\"KORONA\"", "SHOP\\s\"EVROOPT\"", "UNIVERSAM\"ZLATOGORSKIY", "\"BELMARKET\"", "UNIVERSAM\\s\"ALMI\"", "SHOP\\sVESTA")
+        val FOOD_ARRAY = arrayOf("SHOP\\s\"SOSEDI\"", "SHOP\\s\"KORONA\"", "SHOP\\s\"EVROOPT\"", "UNIVERSAM\"ZLATOGORSKIY", "SHOP\\sN\\s130\\s\"BELMARKET\"", "UNIVERSAM\\s\"ALMI\"", "PT\\sSHOP\\sVESTA")
 
         fun getSeller(body: String): Seller {
             val food = buildFoodPattern()
