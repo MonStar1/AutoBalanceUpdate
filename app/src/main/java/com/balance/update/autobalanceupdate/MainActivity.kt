@@ -39,8 +39,6 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
         googleServiceAuth = GoogleServiceAuth(this, object : GoogleServiceAuthListener {
             override fun signedIn(account: GoogleSignInAccount) {
                 textView.text = "Name: ${account.displayName}"
-
-                startActivity(Intent(this@MainActivity, FiltersActivity::class.java))
             }
         })
 

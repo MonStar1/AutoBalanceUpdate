@@ -26,7 +26,11 @@ class UnresolvedSmsActivity : BasePresenterActivity<UnresolvedSmsView>(), Unreso
     private val adapter = RVAdapter(listOf())
 
     override fun doOnCreate() {
-        smsRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+        setTitle(R.string.unresolved_sms)
+
+        smsRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL).apply {
+            setDrawable(getDrawable(R.drawable.divider_transparent)!!)
+        })
         smsRecyclerView.adapter = adapter
     }
 
@@ -44,11 +48,9 @@ class UnresolvedSmsActivity : BasePresenterActivity<UnresolvedSmsView>(), Unreso
 
 }
 
-private class RVAdapter(private var unresolvedSmsList: List<UnresolvedSmsCard>) : RecyclerView.Adapter<RVAdapter.VH>(), View.OnClickListener {
+private class RVAdapter(private var unresolvedSmsList: List<UnresolvedSmsCard>) : RecyclerView.Adapter<RVAdapter.VH>() {
 
-    override fun onClick(v: View?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    var onApplyListener: OnApplyListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         return VH(LayoutInflater.from(parent.context).inflate(R.layout.view_unresolved_sms, parent, false))
@@ -59,11 +61,15 @@ private class RVAdapter(private var unresolvedSmsList: List<UnresolvedSmsCard>) 
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
-        val sms = unresolvedSmsList[position].unresolvedSms
+        val card = unresolvedSmsList[position]
+        val sms = card.unresolvedSms
 
+        holder.unresolvedSmsCard = card
         holder.sender.text = sms.sender
         holder.body.text = sms.body
-        holder.filterSpinner.adapter = FiltersSpinnerAdapter(holder.itemView.context, unresolvedSmsList[position].filters)
+        holder.filterSpinner.adapter = FiltersSpinnerAdapter(holder.itemView.context, card.filters.toMutableList().apply {
+            add(0, Filter(null, "None", listOf()))
+        })
     }
 
     fun setList(list: List<UnresolvedSmsCard>) {
@@ -77,15 +83,38 @@ private class RVAdapter(private var unresolvedSmsList: List<UnresolvedSmsCard>) 
         diffResult.dispatchUpdatesTo(this)
     }
 
-    private inner class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    private inner class VH(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
         val applyButton = itemView.findViewById<Button>(R.id.applyButton)!!
         val sender = itemView.findViewById<TextView>(R.id.sender)!!
         val body = itemView.findViewById<TextView>(R.id.body)!!
-        val filterSpinner = itemView.findViewById<Spinner>(R.id.body)!!
+        val filterSpinner = itemView.findViewById<Spinner>(R.id.filterSelection)!!
+
+        lateinit var unresolvedSmsCard: UnresolvedSmsCard
 
         init {
-            applyButton.setOnClickListener(this@RVAdapter)
+            applyButton.setOnClickListener(this)
+            filterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    val selectedItem = (filterSpinner.selectedItem as Filter)
+
+                    applyButton.isEnabled = selectedItem.key != null
+                }
+            }
         }
+
+        override fun onClick(v: View?) {
+            when (v) {
+                applyButton -> {
+                    onApplyListener?.onApplyClicked(unresolvedSmsCard)
+                }
+            }
+        }
+    }
+
+    interface OnApplyListener {
+        fun onApplyClicked(unresolvedSmsCard: UnresolvedSmsCard)
     }
 
 }

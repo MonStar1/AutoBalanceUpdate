@@ -9,7 +9,11 @@ data class Filter(
         @PrimaryKey(autoGenerate = true) var key: Int? = null,
         var filterName: String,
         var filterPattern: List<String>
-)
+) {
+    override fun toString(): String {
+        return filterName
+    }
+}
 
 class FilterDiffCallback(private val oldListFilter: List<Filter>, private val newListFilter: List<Filter>) : DiffUtil.Callback() {
 

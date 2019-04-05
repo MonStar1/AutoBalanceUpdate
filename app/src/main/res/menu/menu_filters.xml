@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <item
         android:id="@+id/action_unresolved_sms"
-        android:icon="@drawable/ic_unresolved_sms_black_24dp"
+        android:icon="@drawable/ic_message_black_24dp"
         android:orderInCategory="100"
         android:title="Unresolved SMS"
         app:showAsAction="ifRoom" />

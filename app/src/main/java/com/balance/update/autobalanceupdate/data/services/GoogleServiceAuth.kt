@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import com.balance.update.autobalanceupdate.extension.loge
 import com.balance.update.autobalanceupdate.extension.toast
+import com.balance.update.autobalanceupdate.presentation.filters.FiltersActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -50,6 +51,8 @@ class GoogleServiceAuth(val activity: Activity, val listener: GoogleServiceAuthL
                 loge(ex)
                 toast(activity, "statusCode: ${ex.statusCode}")
             }
+
+            activity.startActivity(Intent(activity, FiltersActivity::class.java))
         }
     }
 }

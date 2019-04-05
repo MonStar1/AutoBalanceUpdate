@@ -30,10 +30,6 @@ class SmsParserService : IntentService("SmsService") {
 
 
     override fun onHandleIntent(intent: Intent) {
-        SetUnresolvedSms().apply {
-            execute(SmsInput("MTBANK", "Test data body")).subscribeBy(onError = {})
-        }
-
         Telephony.Sms.Intents.getMessagesFromIntent(intent).forEach {
             handleMessage(it.originatingAddress, it.messageBody)
         }
@@ -41,6 +37,12 @@ class SmsParserService : IntentService("SmsService") {
 
     private fun handleMessage(sender: String, messageBody: String) {
         toast(this, "message: $messageBody")
+
+        SetUnresolvedSms().apply {
+            execute(SmsInput(sender, messageBody)).subscribeBy(
+                    onError = {},
+                    onSuccess = {})
+        }
 
         val googleAccountCredential = GoogleAccountCredential
                 .usingOAuth2(this, GoogleServiceAuth.SCOPES)
