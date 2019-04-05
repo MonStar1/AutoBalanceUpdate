@@ -25,12 +25,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".filter.presentation.FiltersActivity" />
+        <activity
+            android:name="com.balance.update.autobalanceupdate.presentation.filters.FiltersActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".presentation.unresolved.UnresolvedSmsActivity" />
 
-        <service android:name=".sms.SmsParserService" />
+        <service android:name="com.balance.update.autobalanceupdate.data.services.sms.SmsParserService" />
 
         <receiver
-            android:name=".sms.SmsBroadcastReceiver"
+            android:name="com.balance.update.autobalanceupdate.data.services.sms.SmsBroadcastReceiver"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BROADCAST_SMS">

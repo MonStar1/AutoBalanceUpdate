@@ -14,6 +14,10 @@ fun toast(context: Context, text: String, duration: Int = Toast.LENGTH_SHORT) {
     }
 }
 
+fun toast(context: Context, error: Throwable) {
+    toast(context, error.localizedMessage, Toast.LENGTH_LONG)
+}
+
 fun logd(text: String?) {
     Log.d("logoff", text ?: "null")
 }

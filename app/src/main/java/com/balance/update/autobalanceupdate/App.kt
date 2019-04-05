@@ -2,7 +2,7 @@ package com.balance.update.autobalanceupdate
 
 import android.app.Application
 import androidx.room.Room
-import com.balance.update.autobalanceupdate.db.AppDatabase
+import com.balance.update.autobalanceupdate.data.db.AppDatabase
 
 class App : Application() {
 

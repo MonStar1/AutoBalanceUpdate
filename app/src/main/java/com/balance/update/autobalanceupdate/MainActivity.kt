@@ -4,12 +4,12 @@ import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.balance.update.autobalanceupdate.data.services.GoogleServiceAuth
+import com.balance.update.autobalanceupdate.data.services.GoogleServiceAuthListener
 import com.balance.update.autobalanceupdate.extension.logd
 import com.balance.update.autobalanceupdate.extension.toast
-import com.balance.update.autobalanceupdate.filter.data.entities.Filter
-import com.balance.update.autobalanceupdate.filter.presentation.FiltersActivity
+import com.balance.update.autobalanceupdate.presentation.filters.FiltersActivity
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.content_main.*
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
