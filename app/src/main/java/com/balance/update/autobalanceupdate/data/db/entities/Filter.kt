@@ -1,6 +1,7 @@
 package com.balance.update.autobalanceupdate.data.db.entities
 
 import androidx.recyclerview.widget.DiffUtil
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -8,7 +9,8 @@ import androidx.room.PrimaryKey
 data class Filter(
         @PrimaryKey(autoGenerate = true) var key: Int? = null,
         var filterName: String,
-        var filterPattern: List<String>
+        @ColumnInfo(name = "count")
+        var countOfSmsPatterns: Int = 0
 ) {
     override fun toString(): String {
         return filterName

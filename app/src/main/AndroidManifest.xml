@@ -29,7 +29,9 @@
         <activity
             android:name="com.balance.update.autobalanceupdate.presentation.filters.FiltersActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".presentation.unresolved.UnresolvedSmsActivity" />
+        <activity
+            android:name=".presentation.unresolved.UnresolvedSmsActivity"
+            android:parentActivityName=".presentation.filters.FiltersActivity" />
 
         <service android:name="com.balance.update.autobalanceupdate.data.services.sms.SmsParserService" />
 

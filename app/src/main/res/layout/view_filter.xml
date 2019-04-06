@@ -7,35 +7,34 @@
     android:layout_height="wrap_content"
     android:background="@android:color/white"
     android:orientation="horizontal"
-    android:padding="16dp"
-    android:paddingEnd="8dp"
-    android:paddingStart="8dp">
+    android:padding="8dp">
 
     <TextView
         android:id="@+id/name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:textSize="22sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/delete"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintEnd_toStartOf="@+id/countLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/full_names" />
 
-    <ImageButton
-        android:id="@+id/delete"
-        style="?android:attr/selectableItemBackground"
+    <TextView
+        android:id="@+id/countLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|end"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
-        android:contentDescription="delete"
-        android:padding="8dp"
-        android:src="@drawable/ic_delete_forever_black_24dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_circle_black"
+        android:gravity="center"
+        android:text="0"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

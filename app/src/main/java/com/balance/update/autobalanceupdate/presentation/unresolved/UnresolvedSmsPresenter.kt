@@ -1,6 +1,10 @@
 package com.balance.update.autobalanceupdate.presentation.unresolved
 
+import com.balance.update.autobalanceupdate.data.db.entities.Filter
+import com.balance.update.autobalanceupdate.data.db.entities.UnresolvedSms
 import com.balance.update.autobalanceupdate.domain.filter.GetFilters
+import com.balance.update.autobalanceupdate.domain.unresolved.CreateSmsPattern
+import com.balance.update.autobalanceupdate.domain.unresolved.CreateSmsPatternInput
 import com.balance.update.autobalanceupdate.domain.unresolved.GetUnresolvedSms
 import com.balance.update.autobalanceupdate.presentation.BasePresenter
 import com.balance.update.autobalanceupdate.presentation.MvpView
@@ -14,6 +18,7 @@ interface UnresolvedSmsView : MvpView {
 class UnresolvedSmsPresenter : BasePresenter<UnresolvedSmsView>() {
     private val getUnresolvedSms = GetUnresolvedSms()
     private val getFilters = GetFilters()
+    private val createSmsPattern = CreateSmsPattern()
 
     override fun onViewAttached(view: UnresolvedSmsView) {
         super.onViewAttached(view)
@@ -38,6 +43,19 @@ class UnresolvedSmsPresenter : BasePresenter<UnresolvedSmsView>() {
                                 onNext = { view?.setUnresolvedSms(it) }
                         )
 
+        )
+    }
+
+    fun applyFilterTo(filter: Filter, unresolvedSms: UnresolvedSms) {
+        view?.showProgress(true)
+
+        disposable.add(
+                createSmsPattern.execute(CreateSmsPatternInput(filter, unresolvedSms.sender, unresolvedSms.body, unresolvedSms))
+                        .doAfterTerminate { view?.showProgress(false) }
+                        .subscribeBy(
+                                onError = { view?.onError(it) },
+                                onSuccess = {}
+                        )
         )
     }
 

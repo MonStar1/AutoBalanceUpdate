@@ -1,7 +1,6 @@
 package com.balance.update.autobalanceupdate.data.repository
 
 import com.balance.update.autobalanceupdate.App
-import com.balance.update.autobalanceupdate.data.db.entities.Filter
 import com.balance.update.autobalanceupdate.data.db.entities.UnresolvedSms
 import io.reactivex.Maybe
 import io.reactivex.Observable

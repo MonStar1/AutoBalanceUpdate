@@ -27,11 +27,19 @@ class UnresolvedSmsActivity : BasePresenterActivity<UnresolvedSmsView>(), Unreso
 
     override fun doOnCreate() {
         setTitle(R.string.unresolved_sms)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
 
         smsRecyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL).apply {
             setDrawable(getDrawable(R.drawable.divider_transparent)!!)
         })
         smsRecyclerView.adapter = adapter
+
+        adapter.onApplyListener = object : RVAdapter.OnApplyListener {
+            override fun onApplyClicked(unresolvedSms: UnresolvedSms, filter: Filter) {
+                presenter.applyFilterTo(filter, unresolvedSms)
+            }
+        }
     }
 
     override fun setUnresolvedSms(list: List<UnresolvedSmsCard>) {
@@ -68,7 +76,7 @@ private class RVAdapter(private var unresolvedSmsList: List<UnresolvedSmsCard>) 
         holder.sender.text = sms.sender
         holder.body.text = sms.body
         holder.filterSpinner.adapter = FiltersSpinnerAdapter(holder.itemView.context, card.filters.toMutableList().apply {
-            add(0, Filter(null, "None", listOf()))
+            add(0, Filter(null, "None"))
         })
     }
 
@@ -107,14 +115,14 @@ private class RVAdapter(private var unresolvedSmsList: List<UnresolvedSmsCard>) 
         override fun onClick(v: View?) {
             when (v) {
                 applyButton -> {
-                    onApplyListener?.onApplyClicked(unresolvedSmsCard)
+                    onApplyListener?.onApplyClicked(unresolvedSmsCard.unresolvedSms, filterSpinner.selectedItem as Filter)
                 }
             }
         }
     }
 
     interface OnApplyListener {
-        fun onApplyClicked(unresolvedSmsCard: UnresolvedSmsCard)
+        fun onApplyClicked(unresolvedSms: UnresolvedSms, filter: Filter)
     }
 
 }

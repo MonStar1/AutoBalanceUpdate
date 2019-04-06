@@ -1,5 +1,6 @@
 package com.balance.update.autobalanceupdate.domain.unresolved
 
+import com.balance.update.autobalanceupdate.data.db.entities.Filter
 import com.balance.update.autobalanceupdate.data.db.entities.UnresolvedSms
 import com.balance.update.autobalanceupdate.data.repository.UnresolvedSmsRepository
 import com.balance.update.autobalanceupdate.domain.ObservableInteractor

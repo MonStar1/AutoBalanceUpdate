@@ -33,7 +33,7 @@
         android:clickable="true"
         android:focusable="true"
         android:text="+"
-        app:fabSize="normal"
+        app:fabSize="mini"
         app:layout_anchor="@id/bottomAppBar"
         app:srcCompat="@drawable/ic_add_black_24dp" />
 

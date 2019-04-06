@@ -1,7 +1,10 @@
 package com.balance.update.autobalanceupdate.presentation.filters
 
 import com.balance.update.autobalanceupdate.data.db.entities.Filter
-import com.balance.update.autobalanceupdate.data.repository.FilterRepository
+import com.balance.update.autobalanceupdate.domain.filter.CreateFilter
+import com.balance.update.autobalanceupdate.domain.filter.DeleteFilter
+import com.balance.update.autobalanceupdate.domain.filter.GetFilters
+import com.balance.update.autobalanceupdate.domain.filter.UpdateFilter
 import com.balance.update.autobalanceupdate.presentation.BasePresenter
 import com.balance.update.autobalanceupdate.presentation.MvpView
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -14,7 +17,10 @@ interface FilterView : MvpView {
 }
 
 class FiltersPresenter : BasePresenter<FilterView>() {
-    private val repository = FilterRepository()
+    private val getFilters = GetFilters()
+    private val createFilter = CreateFilter()
+    private val deleteFilter = DeleteFilter()
+    private val updateFilter = UpdateFilter()
 
     override fun onViewAttached(view: FilterView) {
         super.onViewAttached(view)
@@ -26,7 +32,7 @@ class FiltersPresenter : BasePresenter<FilterView>() {
         view?.showProgress(true)
 
         disposable.add(
-                repository.loadAll()
+                getFilters.execute(Unit)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doAfterNext { view?.showProgress(false) }
@@ -41,7 +47,7 @@ class FiltersPresenter : BasePresenter<FilterView>() {
         view?.showProgress(true)
 
         disposable.add(
-                repository.create(filterName)
+                createFilter.execute(filterName)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doAfterTerminate { view?.showProgress(false) }
@@ -55,7 +61,7 @@ class FiltersPresenter : BasePresenter<FilterView>() {
         view?.showProgress(true)
 
         disposable.add(
-                repository.delete(filter)
+                deleteFilter.execute(filter)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doAfterTerminate { view?.showProgress(false) }
@@ -69,12 +75,13 @@ class FiltersPresenter : BasePresenter<FilterView>() {
         view?.showProgress(true)
 
         disposable.add(
-                repository.update(filter)
+                updateFilter.execute(filter)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .doAfterTerminate { view?.showProgress(false) }
                         .subscribeBy(
-                                onError = { view?.onError(it) }
+                                onError = { view?.onError(it) },
+                                onSuccess = {}
                         )
         )
     }

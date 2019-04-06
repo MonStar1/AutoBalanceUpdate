@@ -11,12 +11,12 @@ interface FilterDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     fun insert(filter: Filter): Single<Long>
 
-    @Query("SELECT * FROM Filter")
+    @Query("SELECT *, (SELECT COUNT(*) FROM SmsPattern as s WHERE s.filterId = f.`key`) as count FROM Filter as f")
     fun loadAll(): Observable<List<Filter>>
 
     @Delete
     fun delete(filter: Filter): Maybe<Int>
 
-    @Update
-    fun update(filter: Filter): Maybe<Int>
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun update(filter: Filter): Single<Long>
 }

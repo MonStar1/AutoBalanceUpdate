@@ -11,7 +11,7 @@ class FilterRepository {
     private val dao = App.db.getFilterDao()
 
     fun create(filterName: String): Single<Long> {
-        return dao.insert(Filter(filterName = filterName, filterPattern = listOf()))
+        return dao.insert(Filter(filterName = filterName))
     }
 
     fun loadAll(): Observable<List<Filter>> {
@@ -22,7 +22,7 @@ class FilterRepository {
         return dao.delete(filter)
     }
 
-    fun update(filter: Filter): Maybe<Int> {
+    fun update(filter: Filter): Single<Long> {
         return dao.update(filter)
     }
 
