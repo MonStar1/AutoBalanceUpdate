@@ -14,8 +14,16 @@ class FilterRepository {
         return dao.insert(Filter(filterName = filterName))
     }
 
-    fun loadAll(): Observable<List<Filter>> {
+    fun subscribeAll(): Observable<List<Filter>> {
+        return dao.subscribeAll()
+    }
+
+    fun loadAll(): Single<List<Filter>> {
         return dao.loadAll()
+    }
+
+    fun loadFilterById(filterId: Int): Single<Filter> {
+        return dao.loadFilterById(filterId)
     }
 
     fun delete(filter: Filter): Maybe<Int> {

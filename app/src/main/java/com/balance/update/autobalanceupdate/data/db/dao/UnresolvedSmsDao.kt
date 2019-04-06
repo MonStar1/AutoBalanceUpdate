@@ -12,7 +12,7 @@ interface UnresolvedSmsDao {
     fun insert(unresolvedSms: UnresolvedSms): Single<Long>
 
     @Query("SELECT * FROM UnresolvedSms")
-    fun loadAll(): Observable<List<UnresolvedSms>>
+    fun subscribeAll(): Observable<List<UnresolvedSms>>
 
     @Delete
     fun delete(filter: UnresolvedSms): Maybe<Int>

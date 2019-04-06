@@ -3,7 +3,7 @@ package com.balance.update.autobalanceupdate.presentation.filters
 import com.balance.update.autobalanceupdate.data.db.entities.Filter
 import com.balance.update.autobalanceupdate.domain.filter.CreateFilter
 import com.balance.update.autobalanceupdate.domain.filter.DeleteFilter
-import com.balance.update.autobalanceupdate.domain.filter.GetFilters
+import com.balance.update.autobalanceupdate.domain.filter.SubscribeFilters
 import com.balance.update.autobalanceupdate.domain.filter.UpdateFilter
 import com.balance.update.autobalanceupdate.presentation.BasePresenter
 import com.balance.update.autobalanceupdate.presentation.MvpView
@@ -17,7 +17,7 @@ interface FilterView : MvpView {
 }
 
 class FiltersPresenter : BasePresenter<FilterView>() {
-    private val getFilters = GetFilters()
+    private val getFilters = SubscribeFilters()
     private val createFilter = CreateFilter()
     private val deleteFilter = DeleteFilter()
     private val updateFilter = UpdateFilter()

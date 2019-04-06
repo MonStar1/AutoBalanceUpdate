@@ -15,7 +15,11 @@ class SmsPatternRepository {
         return dao.insert(SmsPattern(sender = sender, bodyPattern = bodyPattern, filterId = filter.key!!))
     }
 
-    fun loadAll(): Observable<List<SmsPattern>> {
+    fun subscribeAll(): Observable<List<SmsPattern>> {
+        return dao.subscribeAll()
+    }
+
+    fun loadAll(): Single<List<SmsPattern>> {
         return dao.loadAll()
     }
 

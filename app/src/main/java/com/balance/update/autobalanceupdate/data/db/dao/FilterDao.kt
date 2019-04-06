@@ -12,7 +12,13 @@ interface FilterDao {
     fun insert(filter: Filter): Single<Long>
 
     @Query("SELECT *, (SELECT COUNT(*) FROM SmsPattern as s WHERE s.filterId = f.`key`) as count FROM Filter as f")
-    fun loadAll(): Observable<List<Filter>>
+    fun subscribeAll(): Observable<List<Filter>>
+
+    @Query("SELECT *, (SELECT COUNT(*) FROM SmsPattern as s WHERE s.filterId = f.`key`) as count FROM Filter as f")
+    fun loadAll(): Single<List<Filter>>
+
+    @Query("SELECT * FROM Filter WHERE `key` == :filterId")
+    fun loadFilterById(filterId: Int): Single<Filter>
 
     @Delete
     fun delete(filter: Filter): Maybe<Int>

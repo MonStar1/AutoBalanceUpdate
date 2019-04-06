@@ -15,8 +15,8 @@ class UnresolvedSmsRepository {
         return dao.insert(UnresolvedSms(sender = sender, body = body))
     }
 
-    fun loadAll(): Observable<List<UnresolvedSms>> {
-        return dao.loadAll()
+    fun subscribeAll(): Observable<List<UnresolvedSms>> {
+        return dao.subscribeAll()
     }
 
     fun delete(unresolvedSms: UnresolvedSms): Maybe<Int> {

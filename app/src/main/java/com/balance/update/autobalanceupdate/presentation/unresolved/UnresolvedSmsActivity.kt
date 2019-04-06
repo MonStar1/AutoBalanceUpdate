@@ -1,22 +1,22 @@
 package com.balance.update.autobalanceupdate.presentation.unresolved
 
 import android.content.Context
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.balance.update.autobalanceupdate.R
 import com.balance.update.autobalanceupdate.data.db.entities.Filter
-import com.balance.update.autobalanceupdate.data.db.entities.UnresolvedSms
 import com.balance.update.autobalanceupdate.data.db.entities.UnresolvedSmsCallback
 import com.balance.update.autobalanceupdate.extension.toast
 import com.balance.update.autobalanceupdate.presentation.BasePresenterActivity
+import com.balance.update.autobalanceupdate.presentation.entities.SelectedPattern
 import com.balance.update.autobalanceupdate.presentation.entities.UnresolvedSmsCard
+import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_unresolved_sms.*
+import java.util.concurrent.TimeUnit
 
 class UnresolvedSmsActivity : BasePresenterActivity<UnresolvedSmsView>(), UnresolvedSmsView {
 
@@ -36,8 +36,8 @@ class UnresolvedSmsActivity : BasePresenterActivity<UnresolvedSmsView>(), Unreso
         smsRecyclerView.adapter = adapter
 
         adapter.onApplyListener = object : RVAdapter.OnApplyListener {
-            override fun onApplyClicked(unresolvedSms: UnresolvedSms, filter: Filter) {
-                presenter.applyFilterTo(filter, unresolvedSms)
+            override fun onApplyClicked(selectedPattern: SelectedPattern) {
+                presenter.applyFilterTo(selectedPattern)
             }
         }
     }
@@ -98,31 +98,68 @@ private class RVAdapter(private var unresolvedSmsList: List<UnresolvedSmsCard>) 
         val filterSpinner = itemView.findViewById<Spinner>(R.id.filterSelection)!!
 
         lateinit var unresolvedSmsCard: UnresolvedSmsCard
+        lateinit var selectedBodyPattern: String
 
         init {
             applyButton.setOnClickListener(this)
+
             filterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
 
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                    val selectedItem = (filterSpinner.selectedItem as Filter)
-
-                    applyButton.isEnabled = selectedItem.key != null
+                    checkApplyButtonState()
                 }
             }
+
+            body.customSelectionActionModeCallback = object : ActionMode.Callback {
+                override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?) = true
+                override fun onCreateActionMode(mode: ActionMode?, menu: Menu) = true
+
+                override fun onDestroyActionMode(mode: ActionMode?) {
+                    Completable.complete().delay(100, TimeUnit.MILLISECONDS)
+                            .observeOn(AndroidSchedulers.mainThread()).doOnComplete {
+                                checkApplyButtonState()
+                            }.subscribe()
+                }
+
+                override fun onPrepareActionMode(mode: ActionMode?, menu: Menu): Boolean {
+                    while (menu.size() > 0) {
+                        menu.removeItem(menu.getItem(0).itemId)
+                    }
+
+                    val startPosition = body.selectionStart
+                    val endPosition = body.selectionEnd
+
+                    selectedBodyPattern = body.text.substring(startPosition..endPosition)
+
+                    checkApplyButtonState()
+
+                    return true
+                }
+            }
+        }
+
+        private fun checkApplyButtonState() {
+            val selectedItem = (filterSpinner.selectedItem as Filter)
+
+            applyButton.isEnabled = selectedItem.key != null && body.hasSelection()
         }
 
         override fun onClick(v: View?) {
             when (v) {
                 applyButton -> {
-                    onApplyListener?.onApplyClicked(unresolvedSmsCard.unresolvedSms, filterSpinner.selectedItem as Filter)
+                    onApplyListener?.onApplyClicked(SelectedPattern(
+                            sender = unresolvedSmsCard.unresolvedSms.sender,
+                            bodyPattern = selectedBodyPattern,
+                            filter = (filterSpinner.selectedItem as Filter),
+                            unresolvedSms = unresolvedSmsCard.unresolvedSms))
                 }
             }
         }
     }
 
     interface OnApplyListener {
-        fun onApplyClicked(unresolvedSms: UnresolvedSms, filter: Filter)
+        fun onApplyClicked(selectedPattern: SelectedPattern)
     }
 
 }

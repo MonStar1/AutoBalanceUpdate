@@ -12,7 +12,10 @@ interface SmsPatternDao {
     fun insert(entity: SmsPattern): Single<Long>
 
     @Query("SELECT * FROM SmsPattern")
-    fun loadAll(): Observable<List<SmsPattern>>
+    fun subscribeAll(): Observable<List<SmsPattern>>
+
+    @Query("SELECT * FROM SmsPattern")
+    fun loadAll(): Single<List<SmsPattern>>
 
     @Query("SELECT * FROM SmsPattern WHERE filterId = :filterId")
     fun loadAllByFilter(filterId: Int): Observable<List<SmsPattern>>

@@ -1,6 +1,5 @@
 package com.balance.update.autobalanceupdate.domain.unresolved
 
-import com.balance.update.autobalanceupdate.data.db.entities.Filter
 import com.balance.update.autobalanceupdate.data.db.entities.UnresolvedSms
 import com.balance.update.autobalanceupdate.data.repository.UnresolvedSmsRepository
 import com.balance.update.autobalanceupdate.domain.ObservableInteractor
@@ -10,10 +9,10 @@ import io.reactivex.Single
 
 private val repository = UnresolvedSmsRepository()
 
-class GetUnresolvedSms : ObservableInteractor<List<UnresolvedSms>, Unit>() {
+class SubscribeUnresolvedSms : ObservableInteractor<List<UnresolvedSms>, Unit>() {
 
     override fun buildCase(params: Unit): Observable<List<UnresolvedSms>> {
-        return repository.loadAll()
+        return repository.subscribeAll()
     }
 }
 

@@ -11,10 +11,10 @@ import io.reactivex.Single
 
 private val repository = FilterRepository()
 
-class GetFilters : ObservableInteractor<List<Filter>, Unit>() {
+class SubscribeFilters : ObservableInteractor<List<Filter>, Unit>() {
 
     override fun buildCase(params: Unit): Observable<List<Filter>> {
-        return repository.loadAll()
+        return repository.subscribeAll()
     }
 }
 
