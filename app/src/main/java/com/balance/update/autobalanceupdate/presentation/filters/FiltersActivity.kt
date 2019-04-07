@@ -24,6 +24,7 @@ import com.balance.update.autobalanceupdate.data.db.entities.Filter
 import com.balance.update.autobalanceupdate.data.db.entities.FilterDiffCallback
 import com.balance.update.autobalanceupdate.extension.toast
 import com.balance.update.autobalanceupdate.presentation.BasePresenterActivity
+import com.balance.update.autobalanceupdate.presentation.filters.setup.SetupFilterActivity
 import com.balance.update.autobalanceupdate.presentation.unresolved.UnresolvedSmsActivity
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -44,6 +45,12 @@ class FiltersActivity : BasePresenterActivity<FilterView>(), FilterView {
 
         createFilter.setOnClickListener {
             createNewFilter()
+        }
+
+        adapter.onFilterClickedListener = object : RVAdapter.OnFilterClickedListener {
+            override fun onFilterClicked(filter: Filter) {
+                SetupFilterActivity.newInstance(this@FiltersActivity, filter)
+            }
         }
     }
 
@@ -165,6 +172,8 @@ class FiltersActivity : BasePresenterActivity<FilterView>(), FilterView {
 
 private class RVAdapter(private var filters: List<Filter>) : RecyclerView.Adapter<RVAdapter.VH>() {
 
+    var onFilterClickedListener: OnFilterClickedListener? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         return VH(LayoutInflater.from(parent.context).inflate(R.layout.view_filter, parent, false))
     }
@@ -176,6 +185,7 @@ private class RVAdapter(private var filters: List<Filter>) : RecyclerView.Adapte
     override fun onBindViewHolder(holder: VH, position: Int) {
         val filter = filters[position]
 
+        holder.filter = filter
         holder.filterName.text = filter.filterName
         holder.countLabel.text = filter.countOfSmsPatterns.toString()
     }
@@ -194,6 +204,17 @@ private class RVAdapter(private var filters: List<Filter>) : RecyclerView.Adapte
 
     private inner class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val filterName = itemView.findViewById<TextView>(R.id.name)!!
-        val countLabel = itemView.findViewById<TextView>(R.id.countLabel)
+        val countLabel = itemView.findViewById<TextView>(R.id.countLabel)!!
+        lateinit var filter: Filter
+
+        init {
+            itemView.setOnClickListener {
+                onFilterClickedListener?.onFilterClicked(filter)
+            }
+        }
+    }
+
+    interface OnFilterClickedListener {
+        fun onFilterClicked(filter: Filter)
     }
 }

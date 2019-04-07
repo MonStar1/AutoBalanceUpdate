@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.balance.update.autobalanceupdate.R
 import com.balance.update.autobalanceupdate.data.db.entities.Filter
-import com.balance.update.autobalanceupdate.data.db.entities.UnresolvedSmsCallback
+import com.balance.update.autobalanceupdate.data.db.entities.UnresolvedSmsDiffCallback
 import com.balance.update.autobalanceupdate.extension.toast
 import com.balance.update.autobalanceupdate.presentation.BasePresenterActivity
 import com.balance.update.autobalanceupdate.presentation.entities.SelectedPattern
@@ -84,7 +84,7 @@ private class RVAdapter(private var unresolvedSmsList: List<UnresolvedSmsCard>) 
         val oldList = this.unresolvedSmsList.map { it.unresolvedSms }
         val newList = list.map { it.unresolvedSms }
 
-        val callback = UnresolvedSmsCallback(oldList, newList)
+        val callback = UnresolvedSmsDiffCallback(oldList, newList)
         val diffResult = DiffUtil.calculateDiff(callback, true)
 
         this.unresolvedSmsList = list
@@ -130,7 +130,7 @@ private class RVAdapter(private var unresolvedSmsList: List<UnresolvedSmsCard>) 
                     val startPosition = body.selectionStart
                     val endPosition = body.selectionEnd
 
-                    selectedBodyPattern = body.text.substring(startPosition..endPosition)
+                    selectedBodyPattern = body.text.substring(startPosition until endPosition)
 
                     checkApplyButtonState()
 

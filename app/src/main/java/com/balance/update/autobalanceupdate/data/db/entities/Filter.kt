@@ -1,5 +1,7 @@
 package com.balance.update.autobalanceupdate.data.db.entities
 
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -11,9 +13,35 @@ data class Filter(
         var filterName: String,
         @ColumnInfo(name = "count")
         var countOfSmsPatterns: Int = 0
-) {
+) : Parcelable {
+    constructor(parcel: Parcel) : this(
+            parcel.readValue(Int::class.java.classLoader) as? Int,
+            parcel.readString(),
+            parcel.readInt()) {
+    }
+
     override fun toString(): String {
         return filterName
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeValue(key)
+        parcel.writeString(filterName)
+        parcel.writeInt(countOfSmsPatterns)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<Filter> {
+        override fun createFromParcel(parcel: Parcel): Filter {
+            return Filter(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Filter?> {
+            return arrayOfNulls(size)
+        }
     }
 }
 

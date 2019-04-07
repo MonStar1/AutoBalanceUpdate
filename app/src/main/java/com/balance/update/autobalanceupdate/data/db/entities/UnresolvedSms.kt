@@ -11,7 +11,7 @@ data class UnresolvedSms(
         val body: String
 )
 
-class UnresolvedSmsCallback(private val oldList: List<UnresolvedSms>, private val newList: List<UnresolvedSms>) : DiffUtil.Callback() {
+class UnresolvedSmsDiffCallback(private val oldList: List<UnresolvedSms>, private val newList: List<UnresolvedSms>) : DiffUtil.Callback() {
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         return oldList[oldItemPosition].key == newList[newItemPosition].key

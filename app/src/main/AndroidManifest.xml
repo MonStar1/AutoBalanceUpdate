@@ -32,6 +32,9 @@
         <activity
             android:name=".presentation.unresolved.UnresolvedSmsActivity"
             android:parentActivityName=".presentation.filters.FiltersActivity" />
+        <activity
+            android:name=".presentation.filters.setup.SetupFilterActivity"
+            android:parentActivityName=".presentation.filters.FiltersActivity" />
 
         <service android:name="com.balance.update.autobalanceupdate.data.services.sms.SmsParserService" />
 

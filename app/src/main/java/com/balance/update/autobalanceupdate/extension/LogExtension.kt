@@ -23,5 +23,5 @@ fun logd(text: String?) {
 }
 
 fun loge(ex: Exception) {
-    Log.e("logoff", ex.message, ex)
+    Log.e("Exception_logoff", ex.message, ex)
 }

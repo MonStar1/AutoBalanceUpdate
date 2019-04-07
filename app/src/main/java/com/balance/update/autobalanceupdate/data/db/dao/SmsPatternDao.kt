@@ -18,7 +18,7 @@ interface SmsPatternDao {
     fun loadAll(): Single<List<SmsPattern>>
 
     @Query("SELECT * FROM SmsPattern WHERE filterId = :filterId")
-    fun loadAllByFilter(filterId: Int): Observable<List<SmsPattern>>
+    fun subscribeAllByFilter(filterId: Int): Observable<List<SmsPattern>>
 
     @Delete
     fun delete(entity: SmsPattern): Maybe<Int>

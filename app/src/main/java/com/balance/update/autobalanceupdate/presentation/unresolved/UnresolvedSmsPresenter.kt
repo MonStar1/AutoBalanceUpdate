@@ -16,7 +16,6 @@ class UnresolvedSmsPresenter : BasePresenter<UnresolvedSmsView>() {
     private val getUnresolvedSms = SubscribeUnresolvedSms()
     private val getFilters = SubscribeFilters()
     private val createSmsPattern = CreateSmsPattern()
-    private val resolveNewSms = ResolveNewSms()
 
     override fun onViewAttached(view: UnresolvedSmsView) {
         super.onViewAttached(view)

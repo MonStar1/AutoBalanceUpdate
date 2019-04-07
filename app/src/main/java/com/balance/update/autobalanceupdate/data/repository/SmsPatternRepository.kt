@@ -19,6 +19,10 @@ class SmsPatternRepository {
         return dao.subscribeAll()
     }
 
+    fun subscribeAllByFilter(filter: Filter): Observable<List<SmsPattern>> {
+        return dao.subscribeAllByFilter(filter.key!!)
+    }
+
     fun loadAll(): Single<List<SmsPattern>> {
         return dao.loadAll()
     }
