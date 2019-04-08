@@ -8,13 +8,14 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.balance.update.autobalanceupdate.R
-import com.balance.update.autobalanceupdate.data.db.entities.*
+import com.balance.update.autobalanceupdate.data.db.entities.Filter
+import com.balance.update.autobalanceupdate.data.db.entities.Spending
+import com.balance.update.autobalanceupdate.data.db.entities.SpendingDiffCallback
 import com.balance.update.autobalanceupdate.extension.loge
 import com.balance.update.autobalanceupdate.extension.toast
 import com.balance.update.autobalanceupdate.presentation.BasePresenterActivity
 import com.balance.update.autobalanceupdate.presentation.MvpView
 import com.balance.update.autobalanceupdate.presentation.filters.setup.SetupFilterActivity
-import com.balance.update.autobalanceupdate.presentation.unresolved.UnresolvedSmsActivity
 import kotlinx.android.synthetic.main.activity_setup_filter.*
 import java.text.SimpleDateFormat
 import java.util.*

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.archit.calendardaterangepicker.customviews.DateRangeCalendarView
 import com.balance.update.autobalanceupdate.R
 import com.balance.update.autobalanceupdate.data.db.entities.Filter
 import com.balance.update.autobalanceupdate.data.db.entities.FilterDiffCallback
@@ -101,6 +102,19 @@ class FiltersActivity : BasePresenterActivity<FilterView>(), FilterView {
             R.id.action_unresolved_sms -> {
                 startActivity(Intent(this, UnresolvedSmsActivity::class.java))
                 return true
+            }
+            R.id.action_select_date -> {
+                val date = DateRangeCalendarView(this).apply {
+                    layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+
+                }
+
+                AlertDialog.Builder(this)
+                        .setView(date)
+                        .setPositiveButton(android.R.string.ok) { _, _ -> }
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .setTitle("Select date range:")
+                        .show()
             }
         }
         return super.onOptionsItemSelected(item)

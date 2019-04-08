@@ -16,6 +16,8 @@ import com.balance.update.autobalanceupdate.presentation.entities.UnresolvedSmsC
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_unresolved_sms.*
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class UnresolvedSmsActivity : BasePresenterActivity<UnresolvedSmsView>(), UnresolvedSmsView {
@@ -75,6 +77,7 @@ private class RVAdapter(private var unresolvedSmsList: List<UnresolvedSmsCard>) 
         holder.unresolvedSmsCard = card
         holder.sender.text = sms.sender
         holder.body.text = sms.body
+        holder.time.text = SimpleDateFormat.getDateTimeInstance().format(Date(sms.dateInMillis))
         holder.filterSpinner.adapter = FiltersSpinnerAdapter(holder.itemView.context, card.filters.toMutableList().apply {
             add(0, Filter(null, "None"))
         })
@@ -96,6 +99,7 @@ private class RVAdapter(private var unresolvedSmsList: List<UnresolvedSmsCard>) 
         val sender = itemView.findViewById<TextView>(R.id.sender)!!
         val body = itemView.findViewById<TextView>(R.id.body)!!
         val filterSpinner = itemView.findViewById<Spinner>(R.id.filterSelection)!!
+        val time = itemView.findViewById<TextView>(R.id.time)!!
 
         lateinit var unresolvedSmsCard: UnresolvedSmsCard
         lateinit var selectedBodyPattern: String

@@ -1,7 +1,6 @@
 package com.balance.update.autobalanceupdate.data.services.sms.parser
 
 import com.balance.update.autobalanceupdate.data.services.sms.SmsSender
-import com.balance.update.autobalanceupdate.data.services.sms.seller.Seller
 import java.util.regex.Pattern
 
 interface SmsParser {

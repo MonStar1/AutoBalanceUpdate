@@ -3,6 +3,7 @@ package com.balance.update.autobalanceupdate.data.services.sms
 import android.app.IntentService
 import android.content.Intent
 import android.provider.Telephony
+import android.text.format.DateUtils
 import com.balance.update.autobalanceupdate.domain.unresolved.ResolveNewSms
 import com.balance.update.autobalanceupdate.domain.unresolved.ResolveSmsInput
 import com.balance.update.autobalanceupdate.extension.loge
@@ -22,7 +23,7 @@ class SmsParserService : IntentService("SmsService") {
 
     override fun onHandleIntent(intent: Intent) {
         Telephony.Sms.Intents.getMessagesFromIntent(intent).forEach {
-            handleMessage(it.originatingAddress, it.messageBody, it.timestampMillis)
+            handleMessage(it.originatingAddress, it.messageBody, System.currentTimeMillis())
         }
     }
 
