@@ -22,6 +22,6 @@ fun logd(text: String?) {
     Log.d("logoff", text ?: "null")
 }
 
-fun loge(ex: Exception) {
+fun loge(ex: Throwable) {
     Log.e("Exception_logoff", ex.message, ex)
 }

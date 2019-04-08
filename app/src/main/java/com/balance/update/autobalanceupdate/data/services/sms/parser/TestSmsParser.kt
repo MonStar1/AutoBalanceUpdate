@@ -1,11 +1,10 @@
 package com.balance.update.autobalanceupdate.data.services.sms.parser
 
 import com.balance.update.autobalanceupdate.data.services.sms.SmsSender
-import com.balance.update.autobalanceupdate.data.services.sms.seller.Seller
 
 class TestSmsParser(val body: String) : SmsParser {
 
     override fun parse(): SmsData {
-        return SmsData(SmsSender.Mtbank(), Seller.Food(), Amount(Currency.BYN, 1.1), 50.0)
+        return SmsData(SmsSender.Mtbank(), Amount(Currency.BYN, 1.1), 50.0)
     }
 }

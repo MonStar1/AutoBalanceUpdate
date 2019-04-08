@@ -16,12 +16,12 @@ class SubscribeUnresolvedSms : ObservableInteractor<List<UnresolvedSms>, Unit>()
     }
 }
 
-data class SmsInput(val sender: String, val body: String)
+data class SmsInput(val sender: String, val body: String, val dateInMillis: Long)
 
 class SetUnresolvedSms : SingleInteractor<Long, SmsInput>() {
 
     override fun buildCase(params: SmsInput): Single<Long> {
-        return repository.create(params.sender, params.body)
+        return repository.create(params.sender, params.body, params.dateInMillis)
     }
 
 }

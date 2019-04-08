@@ -1,16 +1,16 @@
 package com.balance.update.autobalanceupdate.domain
 
+import io.reactivex.Scheduler
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 
-abstract class SingleInteractor<T, Params> {
+private class SingleDispatcher<T> : Dispatcher<Single<T>> {
 
-    fun execute(params: Params): Single<T> {
-        return buildCase(params)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-    }
+    override fun observeOn(scheduler: Scheduler, source: Single<T>): Single<T> =
+            source.observeOn(scheduler)
 
-    protected abstract fun buildCase(params: Params): Single<T>
+    override fun subscribeOn(scheduler: Scheduler, source: Single<T>): Single<T> =
+            source.subscribeOn(scheduler)
 }
+
+
+abstract class SingleInteractor<Output, Params> : Interactor<Single<Output>, Params>(SingleDispatcher())

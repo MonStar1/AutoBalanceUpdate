@@ -11,7 +11,7 @@ class MtbankSmsParser(val body: String) : SmsParser {
         val balance = getActualBalance()
         val seller = MtbankSellerParser.getSeller(body)
 
-        return SmsData(SmsSender.Mtbank(), seller, spent, balance)
+        return SmsData(SmsSender.Mtbank(), spent, balance)
     }
 
     private fun getSpent(): Amount {

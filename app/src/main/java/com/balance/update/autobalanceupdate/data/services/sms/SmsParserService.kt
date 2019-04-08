@@ -3,18 +3,10 @@ package com.balance.update.autobalanceupdate.data.services.sms
 import android.app.IntentService
 import android.content.Intent
 import android.provider.Telephony
-import com.balance.update.autobalanceupdate.data.services.GoogleServiceAuth
-import com.balance.update.autobalanceupdate.data.services.sheets.SheetsApi
-import com.balance.update.autobalanceupdate.data.services.sms.parser.SmsData
-import com.balance.update.autobalanceupdate.data.services.sms.parser.SmsParseException
-import com.balance.update.autobalanceupdate.data.services.sms.parser.SmsSenderException
-import com.balance.update.autobalanceupdate.data.services.sms.seller.Seller
-import com.balance.update.autobalanceupdate.domain.unresolved.*
+import com.balance.update.autobalanceupdate.domain.unresolved.ResolveNewSms
+import com.balance.update.autobalanceupdate.domain.unresolved.ResolveSmsInput
+import com.balance.update.autobalanceupdate.extension.loge
 import com.balance.update.autobalanceupdate.extension.toast
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
-import com.google.api.client.util.ExponentialBackOff
-import com.google.api.services.sheets.v4.model.UpdateValuesResponse
 import io.reactivex.rxkotlin.subscribeBy
 
 class SmsParserService : IntentService("SmsService") {
@@ -30,19 +22,24 @@ class SmsParserService : IntentService("SmsService") {
 
     override fun onHandleIntent(intent: Intent) {
         Telephony.Sms.Intents.getMessagesFromIntent(intent).forEach {
-            handleMessage(it.originatingAddress, it.messageBody)
+            handleMessage(it.originatingAddress, it.messageBody, it.timestampMillis)
         }
     }
 
-    private fun handleMessage(sender: String, messageBody: String) {
-        ResolveNewSms().execute(SmsInput(sender, messageBody))
-                .doOnSuccess {
-                    toast(this@SmsParserService, "Attached to filter: ${it.filterName}")
+    private fun handleMessage(sender: String, messageBody: String, timestampMillis: Long) {
+        ResolveNewSms().execute(ResolveSmsInput(sender, messageBody, timestampMillis))
+                .doOnComplete {
+                    toast(this@SmsParserService, "Attached to filter")
                 }
                 .doOnError {
                     toast(this@SmsParserService, "Please, create new filter for message: $messageBody")
                 }
-                .subscribe { success, error -> }
+                .subscribeBy(
+                        onError = {
+                            toast(this@SmsParserService, it)
+                            loge(it)
+                        }
+                )
 
 //        val googleAccountCredential = GoogleAccountCredential
 //                .usingOAuth2(this, GoogleServiceAuth.SCOPES)

@@ -1,16 +1,16 @@
 package com.balance.update.autobalanceupdate.domain
 
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.Scheduler
 
-abstract class ObservableInteractor<T, Params> {
+private class ObservableDispatcher<T> : Dispatcher<Observable<T>> {
 
-    fun execute(params: Params): Observable<T> {
-        return buildCase(params)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-    }
+    override fun observeOn(scheduler: Scheduler, source: Observable<T>): Observable<T> =
+            source.observeOn(scheduler)
 
-    protected abstract fun buildCase(params: Params): Observable<T>
+    override fun subscribeOn(scheduler: Scheduler, source: Observable<T>): Observable<T> =
+            source.subscribeOn(scheduler)
 }
+
+
+abstract class ObservableInteractor<Output, Params> : Interactor<Observable<Output>, Params>(ObservableDispatcher())

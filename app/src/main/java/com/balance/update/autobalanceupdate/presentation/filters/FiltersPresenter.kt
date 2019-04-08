@@ -33,8 +33,6 @@ class FiltersPresenter : BasePresenter<FilterView>() {
 
         disposable.add(
                 getFilters.execute(Unit)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
                         .doAfterNext { view?.showProgress(false) }
                         .subscribeBy(
                                 onError = { view?.onError(it) },
@@ -48,8 +46,6 @@ class FiltersPresenter : BasePresenter<FilterView>() {
 
         disposable.add(
                 createFilter.execute(filterName)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
                         .doAfterTerminate { view?.showProgress(false) }
                         .subscribeBy(
                                 onError = { view?.onError(it) }
@@ -62,8 +58,6 @@ class FiltersPresenter : BasePresenter<FilterView>() {
 
         disposable.add(
                 deleteFilter.execute(filter)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
                         .doAfterTerminate { view?.showProgress(false) }
                         .subscribeBy(
                                 onError = { view?.onError(it) }
@@ -76,8 +70,6 @@ class FiltersPresenter : BasePresenter<FilterView>() {
 
         disposable.add(
                 updateFilter.execute(filter)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
                         .doAfterTerminate { view?.showProgress(false) }
                         .subscribeBy(
                                 onError = { view?.onError(it) },

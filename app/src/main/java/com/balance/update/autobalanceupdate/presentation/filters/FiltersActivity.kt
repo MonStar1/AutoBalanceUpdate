@@ -4,16 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.ColorDrawable
-import android.os.Bundle
-import android.provider.ContactsContract
 import android.util.Log
 import android.view.*
 import android.widget.EditText
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -24,11 +20,12 @@ import com.balance.update.autobalanceupdate.data.db.entities.Filter
 import com.balance.update.autobalanceupdate.data.db.entities.FilterDiffCallback
 import com.balance.update.autobalanceupdate.extension.toast
 import com.balance.update.autobalanceupdate.presentation.BasePresenterActivity
-import com.balance.update.autobalanceupdate.presentation.filters.setup.SetupFilterActivity
+import com.balance.update.autobalanceupdate.presentation.filters.datainfo.SpendingActivity
 import com.balance.update.autobalanceupdate.presentation.unresolved.UnresolvedSmsActivity
-import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_filters.*
+import java.text.DecimalFormat
+import kotlin.math.roundToInt
 
 class FiltersActivity : BasePresenterActivity<FilterView>(), FilterView {
 
@@ -49,7 +46,7 @@ class FiltersActivity : BasePresenterActivity<FilterView>(), FilterView {
 
         adapter.onFilterClickedListener = object : RVAdapter.OnFilterClickedListener {
             override fun onFilterClicked(filter: Filter) {
-                SetupFilterActivity.newInstance(this@FiltersActivity, filter)
+                SpendingActivity.newInstance(this@FiltersActivity, filter)
             }
         }
     }
@@ -187,7 +184,8 @@ private class RVAdapter(private var filters: List<Filter>) : RecyclerView.Adapte
 
         holder.filter = filter
         holder.filterName.text = filter.filterName
-        holder.countLabel.text = filter.countOfSmsPatterns.toString()
+
+        holder.spentLabel.text = "${DecimalFormat("#.##").format(filter.spent)} ${filter.currency}"
     }
 
     fun setFilters(filters: List<Filter>) {
@@ -204,7 +202,7 @@ private class RVAdapter(private var filters: List<Filter>) : RecyclerView.Adapte
 
     private inner class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val filterName = itemView.findViewById<TextView>(R.id.name)!!
-        val countLabel = itemView.findViewById<TextView>(R.id.countLabel)!!
+        val spentLabel = itemView.findViewById<TextView>(R.id.countLabel)!!
         lateinit var filter: Filter
 
         init {

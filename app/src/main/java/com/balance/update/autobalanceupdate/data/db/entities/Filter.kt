@@ -5,19 +5,22 @@ import android.os.Parcelable
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 @Entity
 data class Filter(
         @PrimaryKey(autoGenerate = true) var key: Int? = null,
         var filterName: String,
-        @ColumnInfo(name = "count")
-        var countOfSmsPatterns: Int = 0
+        var spent: Double = 0.0,
+        val currency: String = "BYN"
 ) : Parcelable {
+
     constructor(parcel: Parcel) : this(
             parcel.readValue(Int::class.java.classLoader) as? Int,
             parcel.readString(),
-            parcel.readInt()) {
+            parcel.readDouble(),
+            parcel.readString()) {
     }
 
     override fun toString(): String {
@@ -27,7 +30,8 @@ data class Filter(
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeValue(key)
         parcel.writeString(filterName)
-        parcel.writeInt(countOfSmsPatterns)
+        parcel.writeDouble(spent)
+        parcel.writeString(currency)
     }
 
     override fun describeContents(): Int {
@@ -43,6 +47,7 @@ data class Filter(
             return arrayOfNulls(size)
         }
     }
+
 }
 
 class FilterDiffCallback(private val oldListFilter: List<Filter>, private val newListFilter: List<Filter>) : DiffUtil.Callback() {

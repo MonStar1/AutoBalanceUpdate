@@ -1,17 +1,16 @@
 package com.balance.update.autobalanceupdate.domain
 
 import io.reactivex.Maybe
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.Scheduler
 
-abstract class MaybeInteractor<T, Params> {
+private class MaybeDispatcher<T> : Dispatcher<Maybe<T>> {
 
-    fun execute(params: Params): Maybe<T> {
-        return buildCase(params)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-    }
+    override fun observeOn(scheduler: Scheduler, source: Maybe<T>): Maybe<T> =
+            source.observeOn(scheduler)
 
-    protected abstract fun buildCase(params: Params): Maybe<T>
+    override fun subscribeOn(scheduler: Scheduler, source: Maybe<T>): Maybe<T> =
+            source.subscribeOn(scheduler)
 }
+
+
+abstract class MaybeInteractor<Output, Params> : Interactor<Maybe<Output>, Params>(MaybeDispatcher())

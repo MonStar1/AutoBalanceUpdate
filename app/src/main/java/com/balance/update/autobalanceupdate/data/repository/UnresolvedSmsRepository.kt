@@ -11,8 +11,9 @@ class UnresolvedSmsRepository {
     private val dao = App.db.getUnresolvedSmsDao()
 
     fun create(sender: String,
-               body: String): Single<Long> {
-        return dao.insert(UnresolvedSms(sender = sender, body = body))
+               body: String,
+               dateInMillis: Long): Single<Long> {
+        return dao.insert(UnresolvedSms(sender = sender, body = body, dateInMillis = dateInMillis))
     }
 
     fun subscribeAll(): Observable<List<UnresolvedSms>> {

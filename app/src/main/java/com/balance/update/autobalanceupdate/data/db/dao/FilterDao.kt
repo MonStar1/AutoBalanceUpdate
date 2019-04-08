@@ -11,10 +11,10 @@ interface FilterDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     fun insert(filter: Filter): Single<Long>
 
-    @Query("SELECT *, (SELECT COUNT(*) FROM SmsPattern as s WHERE s.filterId = f.`key`) as count FROM Filter as f")
+    @Query("SELECT *, (SELECT SUM(spent) FROM Spending as sp WHERE (SELECT filterId FROM SmsPattern WHERE sp.smsPatternId = SmsPattern.`key`) = f.`key`) as spent FROM Filter as f")
     fun subscribeAll(): Observable<List<Filter>>
 
-    @Query("SELECT *, (SELECT COUNT(*) FROM SmsPattern as s WHERE s.filterId = f.`key`) as count FROM Filter as f")
+    @Query("SELECT *, (SELECT SUM(spent) FROM Spending as sp WHERE (SELECT filterId FROM SmsPattern WHERE sp.smsPatternId = SmsPattern.`key`) = f.`key`) as spent FROM Filter as f")
     fun loadAll(): Single<List<Filter>>
 
     @Query("SELECT * FROM Filter WHERE `key` == :filterId")

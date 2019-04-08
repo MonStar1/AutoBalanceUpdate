@@ -2,17 +2,20 @@ package com.balance.update.autobalanceupdate.data.db.entities
 
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity
-data class UnresolvedSms(
-        @PrimaryKey(autoGenerate = true) var key: Int? = null,
-        val sender: String,
-        val body: String,
-        val dateInMillis: Long
+@Entity(foreignKeys = [ForeignKey(entity = SmsPattern::class, parentColumns = ["key"], childColumns = ["smsPatternId"], onDelete = ForeignKey.RESTRICT)])
+data class Spending(
+        val spent: Double,
+        val currency: String,
+        val balance: Double,
+        val dateInMillis: Long,
+        val smsPatternId: Int,
+        @PrimaryKey(autoGenerate = true) var key: Int? = null
 )
 
-class UnresolvedSmsDiffCallback(private val oldList: List<UnresolvedSms>, private val newList: List<UnresolvedSms>) : DiffUtil.Callback() {
+class SpendingDiffCallback(private val oldList: List<Spending>, private val newList: List<Spending>) : DiffUtil.Callback() {
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         return oldList[oldItemPosition].key == newList[newItemPosition].key

@@ -6,12 +6,14 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.balance.update.autobalanceupdate.data.db.dao.FilterDao
 import com.balance.update.autobalanceupdate.data.db.dao.SmsPatternDao
+import com.balance.update.autobalanceupdate.data.db.dao.SpendingDao
 import com.balance.update.autobalanceupdate.data.db.dao.UnresolvedSmsDao
 import com.balance.update.autobalanceupdate.data.db.entities.Filter
 import com.balance.update.autobalanceupdate.data.db.entities.SmsPattern
+import com.balance.update.autobalanceupdate.data.db.entities.Spending
 import com.balance.update.autobalanceupdate.data.db.entities.UnresolvedSms
 
-@Database(entities = [Filter::class, UnresolvedSms::class, SmsPattern::class], version = 9)
+@Database(entities = [Filter::class, UnresolvedSms::class, SmsPattern::class, Spending::class], version = 11)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
@@ -20,6 +22,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun getUnresolvedSmsDao(): UnresolvedSmsDao
 
     abstract fun getSmsPatternDao(): SmsPatternDao
+
+    abstract fun getSpendingDao(): SpendingDao
 }
 
 class Converters {
