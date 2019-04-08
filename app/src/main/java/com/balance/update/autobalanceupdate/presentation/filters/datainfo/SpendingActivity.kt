@@ -16,6 +16,8 @@ import com.balance.update.autobalanceupdate.presentation.MvpView
 import com.balance.update.autobalanceupdate.presentation.filters.setup.SetupFilterActivity
 import com.balance.update.autobalanceupdate.presentation.unresolved.UnresolvedSmsActivity
 import kotlinx.android.synthetic.main.activity_setup_filter.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 interface SpendingView : MvpView {
     fun setSpendingList(list: List<Spending>)
@@ -102,10 +104,11 @@ private class RVAdapter(private var list: List<Spending>) : RecyclerView.Adapter
     override fun onBindViewHolder(holder: VH, position: Int) {
         val spending = list[position]
 
-        holder.sender.text = "Sender" //FIXME hardcode
+        holder.sender.text = spending.sender
         holder.spent.text = spending.spent.toString()
         holder.balance.text = spending.balance.toString()
-        holder.time.text = spending.dateInMillis.toString()
+
+        holder.time.text = SimpleDateFormat.getDateTimeInstance().format(Date(spending.dateInMillis))
         holder.currency.text = spending.currency
     }
 

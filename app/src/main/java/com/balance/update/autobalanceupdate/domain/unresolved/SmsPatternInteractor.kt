@@ -24,6 +24,10 @@ class CreateSmsPattern : SingleInteractor<Long, CreateSmsPatternInput>() {
                 .flatMap { result ->
                     unresolvedRepository.delete(params.unresolvedSms).flatMapSingle { Single.just(result) }
                 }
+                .flatMap {
+                    ResolveNewSms().attach(ResolveSmsInput(params.sender, params.unresolvedSms.body, params.unresolvedSms.dateInMillis))
+                            .toSingleDefault(it)
+                }
     }
 
 }

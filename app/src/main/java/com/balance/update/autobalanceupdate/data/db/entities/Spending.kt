@@ -12,7 +12,9 @@ data class Spending(
         val balance: Double,
         val dateInMillis: Long,
         val smsPatternId: Int,
-        @PrimaryKey(autoGenerate = true) var key: Int? = null
+        val sender: String = "",
+        @PrimaryKey(autoGenerate = true)
+        var key: Int? = null
 )
 
 class SpendingDiffCallback(private val oldList: List<Spending>, private val newList: List<Spending>) : DiffUtil.Callback() {
