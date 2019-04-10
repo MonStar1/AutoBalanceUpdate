@@ -3,11 +3,12 @@ package com.balance.update.autobalanceupdate.data.services.sms
 import android.app.IntentService
 import android.content.Intent
 import android.provider.Telephony
-import android.text.format.DateUtils
+import com.balance.update.autobalanceupdate.domain.unresolved.LoadUnresolvedSms
 import com.balance.update.autobalanceupdate.domain.unresolved.ResolveNewSms
 import com.balance.update.autobalanceupdate.domain.unresolved.ResolveSmsInput
 import com.balance.update.autobalanceupdate.extension.loge
 import com.balance.update.autobalanceupdate.extension.toast
+import com.balance.update.autobalanceupdate.presentation.widget.UnresolvedSmsNotification
 import io.reactivex.rxkotlin.subscribeBy
 
 class SmsParserService : IntentService("SmsService") {
@@ -20,6 +21,7 @@ class SmsParserService : IntentService("SmsService") {
         const val BALANCE_SHEET = "Sheet_1"
     }
 
+    private val notification = UnresolvedSmsNotification(this)
 
     override fun onHandleIntent(intent: Intent) {
         Telephony.Sms.Intents.getMessagesFromIntent(intent).forEach {
@@ -28,17 +30,25 @@ class SmsParserService : IntentService("SmsService") {
     }
 
     private fun handleMessage(sender: String, messageBody: String, timestampMillis: Long) {
-        ResolveNewSms().execute(ResolveSmsInput(sender, messageBody, timestampMillis))
-                .doOnComplete {
-                    toast(this@SmsParserService, "Attached to filter")
-                }
-                .doOnError {
-                    toast(this@SmsParserService, "Please, create new filter for message: $messageBody")
+        if (SmsSender.values().none { it.value == sender }) {
+            return
+        }
+
+        val disposable = ResolveNewSms().execute(ResolveSmsInput(sender, messageBody, timestampMillis))
+                .onErrorResumeNext {
+                    LoadUnresolvedSms().execute(Unit)
+                            .doOnSuccess {
+                                notification.show(it.size)
+                            }.ignoreElement()
                 }
                 .subscribeBy(
                         onError = {
+                            toast(this@SmsParserService, "Please, create new filter for message: $messageBody")
                             toast(this@SmsParserService, it)
                             loge(it)
+                        },
+                        onComplete = {
+                            toast(this@SmsParserService, "Attached to filter")
                         }
                 )
 

@@ -17,11 +17,14 @@ interface SmsPatternDao {
     @Query("SELECT * FROM SmsPattern")
     fun loadAll(): Single<List<SmsPattern>>
 
+    @Query("SELECT * FROM SmsPattern WHERE `key` = :smsPatternId")
+    fun loadById(smsPatternId: Int): Single<SmsPattern>
+
     @Query("SELECT * FROM SmsPattern WHERE filterId = :filterId")
     fun subscribeAllByFilter(filterId: Int): Observable<List<SmsPattern>>
 
     @Delete
-    fun delete(entity: SmsPattern): Maybe<Int>
+    fun delete(entity: SmsPattern): Single<Int>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun update(entity: SmsPattern): Single<Long>

@@ -21,7 +21,7 @@ interface SpendingDao {
     fun subscribeByFilterId(filterId: Int): Observable<List<Spending>>
 
     @Delete
-    fun delete(entity: Spending): Maybe<Int>
+    fun delete(entity: Spending): Single<Int>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun update(entity: Spending): Single<Long>

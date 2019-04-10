@@ -1,5 +1,6 @@
 package com.balance.update.autobalanceupdate.presentation.unresolved
 
+import com.balance.update.autobalanceupdate.data.db.entities.UnresolvedSms
 import com.balance.update.autobalanceupdate.domain.filter.SubscribeFilters
 import com.balance.update.autobalanceupdate.domain.unresolved.*
 import com.balance.update.autobalanceupdate.presentation.BasePresenter
@@ -10,10 +11,12 @@ import io.reactivex.rxkotlin.subscribeBy
 
 interface UnresolvedSmsView : MvpView {
     fun setUnresolvedSms(list: List<UnresolvedSmsCard>)
+    fun showNotification(countOfNotifications: Int)
+    fun getUnresolvedSms(): List<UnresolvedSms>
 }
 
 class UnresolvedSmsPresenter : BasePresenter<UnresolvedSmsView>() {
-    private val getUnresolvedSms = SubscribeUnresolvedSms()
+    private val subscribeUnresolvedSms = SubscribeUnresolvedSms()
     private val getFilters = SubscribeFilters()
     private val createSmsPattern = CreateSmsPattern()
 
@@ -29,7 +32,7 @@ class UnresolvedSmsPresenter : BasePresenter<UnresolvedSmsView>() {
         disposable.add(
                 getFilters.execute(Unit)
                         .flatMap { listFilter ->
-                            getUnresolvedSms.execute(Unit)
+                            subscribeUnresolvedSms.execute(Unit)
                                     .map { listSms ->
                                         listSms.map { UnresolvedSmsCard(it, listFilter) }
                                     }
@@ -37,7 +40,10 @@ class UnresolvedSmsPresenter : BasePresenter<UnresolvedSmsView>() {
                         .doAfterNext { view?.showProgress(false) }
                         .subscribeBy(
                                 onError = { view?.onError(it) },
-                                onNext = { view?.setUnresolvedSms(it) }
+                                onNext = {
+                                    view?.setUnresolvedSms(it)
+                                    view?.showNotification(it.size)
+                                }
                         )
 
         )
@@ -45,13 +51,15 @@ class UnresolvedSmsPresenter : BasePresenter<UnresolvedSmsView>() {
 
     fun applyFilterTo(selectedPattern: SelectedPattern) {
         view?.showProgress(true)
-
         disposable.add(
-                createSmsPattern.execute(CreateSmsPatternInput(selectedPattern.filter, selectedPattern.sender, selectedPattern.bodyPattern, selectedPattern.unresolvedSms))
+                createSmsPattern.execute(CreateSmsPatternInput(selectedPattern.filter, selectedPattern.sender, selectedPattern.bodyPattern))
+                        .flatMapCompletable {
+                            TryResolveExistsUnresolvedSms().execute(view?.getUnresolvedSms()!!)
+                        }
                         .doAfterTerminate { view?.showProgress(false) }
                         .subscribeBy(
                                 onError = { view?.onError(it) },
-                                onSuccess = {}
+                                onComplete = {                                }
                         )
         )
     }

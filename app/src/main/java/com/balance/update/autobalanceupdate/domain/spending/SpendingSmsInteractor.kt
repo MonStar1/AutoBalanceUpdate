@@ -13,9 +13,12 @@ import com.balance.update.autobalanceupdate.domain.ObservableInteractor
 import com.balance.update.autobalanceupdate.domain.SingleInteractor
 import com.balance.update.autobalanceupdate.domain.currency.ConvertCurrency
 import com.balance.update.autobalanceupdate.domain.currency.CurrencyInput
+import com.balance.update.autobalanceupdate.domain.unresolved.LoadSmsPatternById
+import com.balance.update.autobalanceupdate.domain.unresolved.SubscribeSmsPattern
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.rxkotlin.toObservable
 
 data class SpendingInput(val sender: String, val body: String, val dateInMillis: Long, val smsPattern: SmsPattern)
 
@@ -56,6 +59,28 @@ class SubscribeSpendingByFilter : ObservableInteractor<List<Spending>, Filter>()
 
     override fun buildCase(params: Filter): Observable<List<Spending>> {
         return repository.subscribeByFilterId(params.key!!)
+    }
+
+}
+
+data class SpendingWithPattern(val spending: Spending, val smsPattern: SmsPattern)
+class SubscribeSpendingWithPatternByFilter : ObservableInteractor<List<SpendingWithPattern>, Filter>() {
+
+    private val spending = SubscribeSpendingByFilter()
+    private val smsPattern = LoadSmsPatternById()
+
+    override fun buildCase(params: Filter): Observable<List<SpendingWithPattern>> {
+        return spending.attach(params)
+                .flatMapSingle {
+                    it.toObservable()
+                            .flatMapSingle { spending ->
+                                smsPattern.attach(spending.smsPatternId)
+                                        .map { pattern ->
+                                            SpendingWithPattern(spending, pattern)
+                                        }
+                            }
+                            .toList()
+                }
     }
 
 }

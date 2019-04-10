@@ -18,13 +18,13 @@
         android:layout_marginStart="8dp"
         android:textSize="22sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/countLabel"
+        app:layout_constraintEnd_toStartOf="@+id/spentLabel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/full_names" />
 
     <TextView
-        android:id="@+id/countLabel"
+        android:id="@+id/spentLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"

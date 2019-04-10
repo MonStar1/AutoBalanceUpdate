@@ -2,6 +2,7 @@ package com.balance.update.autobalanceupdate.data.repository
 
 import com.balance.update.autobalanceupdate.App
 import com.balance.update.autobalanceupdate.data.db.entities.UnresolvedSms
+import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -20,12 +21,16 @@ class UnresolvedSmsRepository {
         return dao.subscribeAll()
     }
 
-    fun delete(unresolvedSms: UnresolvedSms): Maybe<Int> {
+    fun delete(unresolvedSms: UnresolvedSms): Completable {
         return dao.delete(unresolvedSms)
     }
 
     fun update(unresolvedSms: UnresolvedSms): Maybe<Int> {
         return dao.update(unresolvedSms)
+    }
+
+    fun loadAll(): Single<List<UnresolvedSms>> {
+        return dao.loadAll()
     }
 
 }

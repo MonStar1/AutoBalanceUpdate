@@ -1,26 +1,27 @@
 package com.balance.update.autobalanceupdate.presentation.filters
 
 import com.balance.update.autobalanceupdate.data.db.entities.Filter
-import com.balance.update.autobalanceupdate.domain.filter.CreateFilter
-import com.balance.update.autobalanceupdate.domain.filter.DeleteFilter
-import com.balance.update.autobalanceupdate.domain.filter.SubscribeFilters
-import com.balance.update.autobalanceupdate.domain.filter.UpdateFilter
+import com.balance.update.autobalanceupdate.data.memory.DateRange
+import com.balance.update.autobalanceupdate.domain.filter.*
 import com.balance.update.autobalanceupdate.presentation.BasePresenter
 import com.balance.update.autobalanceupdate.presentation.MvpView
-import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 
 interface FilterView : MvpView {
     fun setFilters(arrayOfFilters: List<Filter>)
-
+    fun setDateRange(dateRange: DateRange)
 }
 
 class FiltersPresenter : BasePresenter<FilterView>() {
-    private val getFilters = SubscribeFilters()
+    private val getDateRange = GetDateRange()
+    private val setDateRange = SetDateRange()
+    private val getFilters = SubscribeFiltersByRangeDate()
     private val createFilter = CreateFilter()
     private val deleteFilter = DeleteFilter()
     private val updateFilter = UpdateFilter()
+
+    private var subscribeFilterDisposable: Disposable? = null
 
     override fun onViewAttached(view: FilterView) {
         super.onViewAttached(view)
@@ -31,13 +32,23 @@ class FiltersPresenter : BasePresenter<FilterView>() {
     private fun subscribeFilters() {
         view?.showProgress(true)
 
+        subscribeFilterDisposable?.dispose()
+
+        subscribeFilterDisposable = getDateRange.execute(Unit)
+                .doOnSuccess {
+                    view?.setDateRange(it)
+                }
+                .flatMapObservable {
+                    getFilters.execute(it)
+                }
+                .doAfterNext { view?.showProgress(false) }
+                .subscribeBy(
+                        onError = { view?.onError(it) },
+                        onNext = { view?.setFilters(it) }
+                )
+
         disposable.add(
-                getFilters.execute(Unit)
-                        .doAfterNext { view?.showProgress(false) }
-                        .subscribeBy(
-                                onError = { view?.onError(it) },
-                                onNext = { view?.setFilters(it) }
-                        )
+                subscribeFilterDisposable!!
         )
     }
 
@@ -74,6 +85,16 @@ class FiltersPresenter : BasePresenter<FilterView>() {
                         .subscribeBy(
                                 onError = { view?.onError(it) },
                                 onSuccess = {}
+                        )
+        )
+    }
+
+    fun setSelectedDateRange(startDateInMillis: Long, endDateInMillis: Long) {
+        disposable.add(
+                setDateRange.execute(DateRange(startDateInMillis, endDateInMillis))
+                        .subscribeBy(
+                                onError = { view?.onError(it) },
+                                onComplete = { subscribeFilters() }
                         )
         )
     }

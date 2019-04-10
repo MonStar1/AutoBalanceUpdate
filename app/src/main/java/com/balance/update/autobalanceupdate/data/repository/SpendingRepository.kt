@@ -30,7 +30,7 @@ class SpendingRepository {
         return dao.subscribeByFilterId(filterId)
     }
 
-    fun delete(entity: Spending): Maybe<Int> {
+    fun delete(entity: Spending): Single<Int> {
         return dao.delete(entity)
     }
 

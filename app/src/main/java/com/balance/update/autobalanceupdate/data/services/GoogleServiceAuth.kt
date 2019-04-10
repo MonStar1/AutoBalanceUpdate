@@ -51,8 +51,6 @@ class GoogleServiceAuth(val activity: Activity, val listener: GoogleServiceAuthL
                 loge(ex)
                 toast(activity, "statusCode: ${ex.statusCode}")
             }
-
-            activity.startActivity(Intent(activity, FiltersActivity::class.java))
         }
     }
 }

@@ -2,12 +2,27 @@ package com.balance.update.autobalanceupdate.domain.unresolved
 
 import com.balance.update.autobalanceupdate.data.db.entities.UnresolvedSms
 import com.balance.update.autobalanceupdate.data.repository.UnresolvedSmsRepository
+import com.balance.update.autobalanceupdate.domain.CompletableInteractor
 import com.balance.update.autobalanceupdate.domain.ObservableInteractor
 import com.balance.update.autobalanceupdate.domain.SingleInteractor
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 
 private val repository = UnresolvedSmsRepository()
+
+class DeleteUnresolvedSms : CompletableInteractor<UnresolvedSms>() {
+    override fun buildCase(params: UnresolvedSms): Completable {
+        return repository.delete(params)
+    }
+}
+
+class LoadUnresolvedSms : SingleInteractor<List<UnresolvedSms>, Unit>() {
+
+    override fun buildCase(params: Unit): Single<List<UnresolvedSms>> {
+        return repository.loadAll()
+    }
+}
 
 class SubscribeUnresolvedSms : ObservableInteractor<List<UnresolvedSms>, Unit>() {
 

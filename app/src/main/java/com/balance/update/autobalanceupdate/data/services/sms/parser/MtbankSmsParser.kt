@@ -8,7 +8,7 @@ class MtbankSmsParser(val body: String) : SmsParser {
         val spent = getSpent()
         val balance = getActualBalance()
 
-        return SmsData(SmsSender.Mtbank(), spent, balance)
+        return SmsData(SmsSender.Mtbank, spent, balance)
     }
 
     private fun getSpent(): Amount {
@@ -24,7 +24,7 @@ class MtbankSmsParser(val body: String) : SmsParser {
     }
 
     private fun getActualBalance(): Double {
-        val matcher = buildPattern("OSTATOK", Currency.BYN.value).matcher(body)
+        val matcher = buildPattern("OSTATOK", Currency.getPattern()).matcher(body)
 
         if (matcher.matches()) {
             return matcher.group(1).toDouble()

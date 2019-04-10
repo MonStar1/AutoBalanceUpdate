@@ -8,11 +8,13 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.balance.update.autobalanceupdate.R
 import com.balance.update.autobalanceupdate.data.db.entities.Filter
+import com.balance.update.autobalanceupdate.data.db.entities.UnresolvedSms
 import com.balance.update.autobalanceupdate.data.db.entities.UnresolvedSmsDiffCallback
 import com.balance.update.autobalanceupdate.extension.toast
 import com.balance.update.autobalanceupdate.presentation.BasePresenterActivity
 import com.balance.update.autobalanceupdate.presentation.entities.SelectedPattern
 import com.balance.update.autobalanceupdate.presentation.entities.UnresolvedSmsCard
+import com.balance.update.autobalanceupdate.presentation.widget.UnresolvedSmsNotification
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_unresolved_sms.*
@@ -26,6 +28,7 @@ class UnresolvedSmsActivity : BasePresenterActivity<UnresolvedSmsView>(), Unreso
     override val layoutId = R.layout.activity_unresolved_sms
 
     private val adapter = RVAdapter(listOf())
+    private val notification = UnresolvedSmsNotification(this)
 
     override fun doOnCreate() {
         setTitle(R.string.unresolved_sms)
@@ -56,6 +59,13 @@ class UnresolvedSmsActivity : BasePresenterActivity<UnresolvedSmsView>(), Unreso
         progress.visibility = if (isVisible) View.VISIBLE else View.GONE
     }
 
+    override fun showNotification(countOfNotifications: Int) {
+        notification.show(countOfNotifications)
+    }
+
+    override fun getUnresolvedSms(): List<UnresolvedSms> {
+        return adapter.getList().map { it.unresolvedSms }
+    }
 }
 
 private class RVAdapter(private var unresolvedSmsList: List<UnresolvedSmsCard>) : RecyclerView.Adapter<RVAdapter.VH>() {
@@ -82,6 +92,8 @@ private class RVAdapter(private var unresolvedSmsList: List<UnresolvedSmsCard>) 
             add(0, Filter(null, "None"))
         })
     }
+
+    fun getList() = unresolvedSmsList
 
     fun setList(list: List<UnresolvedSmsCard>) {
         val oldList = this.unresolvedSmsList.map { it.unresolvedSms }
@@ -131,11 +143,6 @@ private class RVAdapter(private var unresolvedSmsList: List<UnresolvedSmsCard>) 
                         menu.removeItem(menu.getItem(0).itemId)
                     }
 
-                    val startPosition = body.selectionStart
-                    val endPosition = body.selectionEnd
-
-                    selectedBodyPattern = body.text.substring(startPosition until endPosition)
-
                     checkApplyButtonState()
 
                     return true
@@ -146,6 +153,11 @@ private class RVAdapter(private var unresolvedSmsList: List<UnresolvedSmsCard>) 
         private fun checkApplyButtonState() {
             val selectedItem = (filterSpinner.selectedItem as Filter)
 
+            val startPosition = body.selectionStart
+            val endPosition = body.selectionEnd
+
+            selectedBodyPattern = body.text.substring(startPosition until endPosition)
+
             applyButton.isEnabled = selectedItem.key != null && body.hasSelection()
         }
 
@@ -155,8 +167,8 @@ private class RVAdapter(private var unresolvedSmsList: List<UnresolvedSmsCard>) 
                     onApplyListener?.onApplyClicked(SelectedPattern(
                             sender = unresolvedSmsCard.unresolvedSms.sender,
                             bodyPattern = selectedBodyPattern,
-                            filter = (filterSpinner.selectedItem as Filter),
-                            unresolvedSms = unresolvedSmsCard.unresolvedSms))
+                            filter = (filterSpinner.selectedItem as Filter)
+                    ))
                 }
             }
         }

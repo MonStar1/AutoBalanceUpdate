@@ -15,6 +15,7 @@ import com.archit.calendardaterangepicker.customviews.DateRangeCalendarView
 import com.balance.update.autobalanceupdate.R
 import com.balance.update.autobalanceupdate.data.db.entities.Filter
 import com.balance.update.autobalanceupdate.data.db.entities.FilterDiffCallback
+import com.balance.update.autobalanceupdate.data.memory.DateRange
 import com.balance.update.autobalanceupdate.extension.toast
 import com.balance.update.autobalanceupdate.presentation.BasePresenterActivity
 import com.balance.update.autobalanceupdate.presentation.filters.datainfo.SpendingActivity
@@ -22,12 +23,14 @@ import com.balance.update.autobalanceupdate.presentation.unresolved.UnresolvedSm
 import com.balance.update.autobalanceupdate.presentation.widget.SwipeToDelete
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_filters.*
-import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
 class FiltersActivity : BasePresenterActivity<FilterView>(), FilterView {
 
     override val presenter = FiltersPresenter()
     private val adapter = RVAdapter(listOf())
+    private var calendarPair: Pair<Calendar, Calendar>? = null
     override val layoutId = R.layout.activity_filters
 
     override fun doOnCreate() {
@@ -72,6 +75,23 @@ class FiltersActivity : BasePresenterActivity<FilterView>(), FilterView {
         progress.visibility = if (isVisible) View.VISIBLE else View.GONE
     }
 
+    override fun setDateRange(dateRange: DateRange) {
+        val startCalendar = Calendar.getInstance().apply {
+            timeInMillis = dateRange.startDate
+        }
+
+        val endCalendar = Calendar.getInstance().apply {
+            timeInMillis = dateRange.endDate
+        }
+
+        val startString = SimpleDateFormat.getDateInstance().format(startCalendar.time)
+        val endString = SimpleDateFormat.getDateInstance().format(endCalendar.time)
+
+        calendarPair = Pair(startCalendar, endCalendar)
+
+        dateRangeTextView.text = getString(R.string.template_range_date, startString, endString)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         presenter.onViewDetached()
@@ -104,14 +124,17 @@ class FiltersActivity : BasePresenterActivity<FilterView>(), FilterView {
                 return true
             }
             R.id.action_select_date -> {
-                val date = DateRangeCalendarView(this).apply {
-                    layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-
-                }
+                val calendarView =
+                        DateRangeCalendarView(this).apply {
+                            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+                            calendarPair?.let { this.setSelectedDateRange(it.first, it.second) }
+                        }
 
                 AlertDialog.Builder(this)
-                        .setView(date)
-                        .setPositiveButton(android.R.string.ok) { _, _ -> }
+                        .setView(calendarView)
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            presenter.setSelectedDateRange(calendarView.startDate.timeInMillis, calendarView.endDate.timeInMillis)
+                        }
                         .setNegativeButton(android.R.string.cancel, null)
                         .setTitle("Select date range:")
                         .show()
@@ -140,7 +163,7 @@ private class RVAdapter(private var filters: List<Filter>) : RecyclerView.Adapte
         holder.filter = filter
         holder.filterName.text = filter.filterName
 
-        holder.spentLabel.text = "${DecimalFormat("#.##").format(filter.spent)} ${filter.currency}"
+        holder.spentLabel.text = holder.itemView.context.getString(R.string.template_amount_with_currency, filter.spent, filter.currency)
     }
 
     fun setFilters(filters: List<Filter>) {
@@ -157,7 +180,7 @@ private class RVAdapter(private var filters: List<Filter>) : RecyclerView.Adapte
 
     private inner class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val filterName = itemView.findViewById<TextView>(R.id.name)!!
-        val spentLabel = itemView.findViewById<TextView>(R.id.countLabel)!!
+        val spentLabel = itemView.findViewById<TextView>(R.id.spentLabel)!!
         lateinit var filter: Filter
 
         init {

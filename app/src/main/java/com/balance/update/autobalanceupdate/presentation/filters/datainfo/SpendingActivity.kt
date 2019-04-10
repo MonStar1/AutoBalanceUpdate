@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.balance.update.autobalanceupdate.R
 import com.balance.update.autobalanceupdate.data.db.entities.Filter
-import com.balance.update.autobalanceupdate.data.db.entities.Spending
 import com.balance.update.autobalanceupdate.data.db.entities.SpendingDiffCallback
+import com.balance.update.autobalanceupdate.domain.spending.SpendingWithPattern
 import com.balance.update.autobalanceupdate.extension.loge
 import com.balance.update.autobalanceupdate.extension.toast
 import com.balance.update.autobalanceupdate.presentation.BasePresenterActivity
@@ -21,7 +21,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 interface SpendingView : MvpView {
-    fun setSpendingList(list: List<Spending>)
+    fun setSpendingList(list: List<SpendingWithPattern>)
 }
 
 private const val EXTRA_FILTER = "EXTRA_FILTER"
@@ -68,7 +68,7 @@ class SpendingActivity : BasePresenterActivity<SpendingView>(), SpendingView {
         progress.visibility = if (isVisible) View.VISIBLE else View.GONE
     }
 
-    override fun setSpendingList(list: List<Spending>) {
+    override fun setSpendingList(list: List<SpendingWithPattern>) {
         adapter.setSpendingList(list)
     }
 
@@ -92,7 +92,7 @@ class SpendingActivity : BasePresenterActivity<SpendingView>(), SpendingView {
     }
 }
 
-private class RVAdapter(private var list: List<Spending>) : RecyclerView.Adapter<RVAdapter.VH>() {
+private class RVAdapter(private var list: List<SpendingWithPattern>) : RecyclerView.Adapter<RVAdapter.VH>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         return VH(LayoutInflater.from(parent.context).inflate(R.layout.view_spending, parent, false))
@@ -103,25 +103,31 @@ private class RVAdapter(private var list: List<Spending>) : RecyclerView.Adapter
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
-        val spending = list[position]
+        val spending = list[position].spending
+        val smsPattern = list[position].smsPattern
 
+        val context = holder.itemView.context
+
+        holder.place.text = smsPattern.bodyPattern
         holder.sender.text = spending.sender
-        holder.spent.text = spending.spent.toString()
-        holder.balance.text = spending.balance.toString()
+        holder.spent.text = context.getString(R.string.template_amount_with_currency, spending.spent, spending.currency)
+        holder.balance.text = context.getString(R.string.template_amount_with_currency, spending.balance, spending.currency)
 
         holder.time.text = SimpleDateFormat.getDateTimeInstance().format(Date(spending.dateInMillis))
-        holder.currency.text = spending.currency
     }
 
-    fun setSpendingList(list: List<Spending>) {
-        val callback = SpendingDiffCallback(this.list, list)
+    fun setSpendingList(list: List<SpendingWithPattern>) {
+        val oldList = this.list.map { it.spending }
+        val newList = list.map { it.spending }
+
+        val callback = SpendingDiffCallback(oldList, newList)
         val diffResult = DiffUtil.calculateDiff(callback, true)
 
         this.list = list
         diffResult.dispatchUpdatesTo(this)
     }
 
-    fun getItemByPosition(position: Int): Spending {
+    fun getItemByPosition(position: Int): SpendingWithPattern {
         return list[position]
     }
 
@@ -130,6 +136,6 @@ private class RVAdapter(private var list: List<Spending>) : RecyclerView.Adapter
         val spent = itemView.findViewById<TextView>(R.id.spent)!!
         val balance = itemView.findViewById<TextView>(R.id.balance)!!
         val time = itemView.findViewById<TextView>(R.id.time)!!
-        val currency = itemView.findViewById<TextView>(R.id.currency)!!
+        val place = itemView.findViewById<TextView>(R.id.place)!!
     }
 }

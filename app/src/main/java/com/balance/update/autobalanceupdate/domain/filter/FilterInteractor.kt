@@ -1,11 +1,10 @@
 package com.balance.update.autobalanceupdate.domain.filter
 
 import com.balance.update.autobalanceupdate.data.db.entities.Filter
+import com.balance.update.autobalanceupdate.data.memory.DateRange
 import com.balance.update.autobalanceupdate.data.repository.FilterRepository
-import com.balance.update.autobalanceupdate.domain.MaybeInteractor
 import com.balance.update.autobalanceupdate.domain.ObservableInteractor
 import com.balance.update.autobalanceupdate.domain.SingleInteractor
-import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 
@@ -18,6 +17,13 @@ class SubscribeFilters : ObservableInteractor<List<Filter>, Unit>() {
     }
 }
 
+class SubscribeFiltersByRangeDate : ObservableInteractor<List<Filter>, DateRange>() {
+
+    override fun buildCase(params: DateRange): Observable<List<Filter>> {
+        return repository.subscribeAllByDateRange(params.startDate, params.endDate)
+    }
+}
+
 class CreateFilter : SingleInteractor<Long, String>() {
 
     override fun buildCase(params: String): Single<Long> {
@@ -25,9 +31,9 @@ class CreateFilter : SingleInteractor<Long, String>() {
     }
 }
 
-class DeleteFilter : MaybeInteractor<Int, Filter>() {
+class DeleteFilter : SingleInteractor<Int, Filter>() {
 
-    override fun buildCase(params: Filter): Maybe<Int> {
+    override fun buildCase(params: Filter): Single<Int> {
         return repository.delete(params)
     }
 

@@ -18,6 +18,10 @@ class FilterRepository {
         return dao.subscribeAll()
     }
 
+    fun subscribeAllByDateRange(startDate: Long, endDate: Long): Observable<List<Filter>> {
+        return dao.subscribeAllByDateRange(startDate, endDate)
+    }
+
     fun loadAll(): Single<List<Filter>> {
         return dao.loadAll()
     }
@@ -26,7 +30,7 @@ class FilterRepository {
         return dao.loadFilterById(filterId)
     }
 
-    fun delete(filter: Filter): Maybe<Int> {
+    fun delete(filter: Filter): Single<Int> {
         return dao.delete(filter)
     }
 

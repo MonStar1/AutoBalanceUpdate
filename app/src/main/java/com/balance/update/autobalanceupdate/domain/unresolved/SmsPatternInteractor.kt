@@ -2,32 +2,20 @@ package com.balance.update.autobalanceupdate.domain.unresolved
 
 import com.balance.update.autobalanceupdate.data.db.entities.Filter
 import com.balance.update.autobalanceupdate.data.db.entities.SmsPattern
-import com.balance.update.autobalanceupdate.data.db.entities.UnresolvedSms
 import com.balance.update.autobalanceupdate.data.repository.SmsPatternRepository
-import com.balance.update.autobalanceupdate.data.repository.UnresolvedSmsRepository
-import com.balance.update.autobalanceupdate.domain.MaybeInteractor
 import com.balance.update.autobalanceupdate.domain.ObservableInteractor
 import com.balance.update.autobalanceupdate.domain.SingleInteractor
-import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 
-data class CreateSmsPatternInput(val filter: Filter, val sender: String, val bodyPattern: String, val unresolvedSms: UnresolvedSms)
+data class CreateSmsPatternInput(val filter: Filter, val sender: String, val bodyPattern: String)
 
 class CreateSmsPattern : SingleInteractor<Long, CreateSmsPatternInput>() {
 
     private val repository = SmsPatternRepository()
-    private val unresolvedRepository = UnresolvedSmsRepository()
 
     override fun buildCase(params: CreateSmsPatternInput): Single<Long> {
         return repository.create(params.sender, params.bodyPattern, params.filter)
-                .flatMap { result ->
-                    unresolvedRepository.delete(params.unresolvedSms).flatMapSingle { Single.just(result) }
-                }
-                .flatMap {
-                    ResolveNewSms().attach(ResolveSmsInput(params.sender, params.unresolvedSms.body, params.unresolvedSms.dateInMillis))
-                            .toSingleDefault(it)
-                }
     }
 
 }
@@ -41,11 +29,20 @@ class SubscribeSmsPattern : ObservableInteractor<List<SmsPattern>, Filter>() {
     }
 }
 
-class DeleteSmsPattern : MaybeInteractor<Int, SmsPattern>() {
+class LoadSmsPatternById : SingleInteractor<SmsPattern, Int>() {
 
     private val repository = SmsPatternRepository()
 
-    override fun buildCase(params: SmsPattern): Maybe<Int> {
+    override fun buildCase(params: Int): Single<SmsPattern> {
+        return repository.loadById(params)
+    }
+}
+
+class DeleteSmsPattern : SingleInteractor<Int, SmsPattern>() {
+
+    private val repository = SmsPatternRepository()
+
+    override fun buildCase(params: SmsPattern): Single<Int> {
         return repository.delete(params)
     }
 

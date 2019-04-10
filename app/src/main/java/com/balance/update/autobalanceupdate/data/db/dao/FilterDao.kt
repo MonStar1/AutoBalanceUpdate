@@ -14,6 +14,9 @@ interface FilterDao {
     @Query("SELECT *, (SELECT SUM(spent) FROM Spending as sp WHERE (SELECT filterId FROM SmsPattern WHERE sp.smsPatternId = SmsPattern.`key`) = f.`key`) as spent FROM Filter as f")
     fun subscribeAll(): Observable<List<Filter>>
 
+    @Query("SELECT *, (SELECT SUM(spent) FROM Spending as sp WHERE (SELECT filterId FROM SmsPattern WHERE sp.smsPatternId = SmsPattern.`key`) = f.`key` AND sp.dateInMillis >= :startDate AND sp.dateInMillis < :endDate) as spent FROM Filter as f")
+    fun subscribeAllByDateRange(startDate: Long, endDate: Long): Observable<List<Filter>>
+
     @Query("SELECT *, (SELECT SUM(spent) FROM Spending as sp WHERE (SELECT filterId FROM SmsPattern WHERE sp.smsPatternId = SmsPattern.`key`) = f.`key`) as spent FROM Filter as f")
     fun loadAll(): Single<List<Filter>>
 
@@ -21,7 +24,7 @@ interface FilterDao {
     fun loadFilterById(filterId: Int): Single<Filter>
 
     @Delete
-    fun delete(filter: Filter): Maybe<Int>
+    fun delete(filter: Filter): Single<Int>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun update(filter: Filter): Single<Long>

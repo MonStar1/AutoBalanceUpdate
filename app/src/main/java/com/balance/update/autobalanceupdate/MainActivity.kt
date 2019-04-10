@@ -72,7 +72,9 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
         toast(this@MainActivity, "Permission granted")
 
-        googleServiceAuth.request()
+        startActivity(Intent(this, FiltersActivity::class.java))
+        finish()
+//        googleServiceAuth.request()
     }
 
     override fun onRationaleDenied(requestCode: Int) {

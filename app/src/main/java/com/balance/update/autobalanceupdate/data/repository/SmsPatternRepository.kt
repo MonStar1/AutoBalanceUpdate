@@ -19,6 +19,10 @@ class SmsPatternRepository {
         return dao.subscribeAll()
     }
 
+    fun loadById(smsPatternId: Int): Single<SmsPattern> {
+        return dao.loadById(smsPatternId)
+    }
+
     fun subscribeAllByFilter(filter: Filter): Observable<List<SmsPattern>> {
         return dao.subscribeAllByFilter(filter.key!!)
     }
@@ -27,7 +31,7 @@ class SmsPatternRepository {
         return dao.loadAll()
     }
 
-    fun delete(entity: SmsPattern): Maybe<Int> {
+    fun delete(entity: SmsPattern): Single<Int> {
         return dao.delete(entity)
     }
 
