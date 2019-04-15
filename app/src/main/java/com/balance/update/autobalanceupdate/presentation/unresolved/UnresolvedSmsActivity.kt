@@ -82,15 +82,8 @@ private class RVAdapter(private var unresolvedSmsList: List<UnresolvedSmsCard>) 
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val card = unresolvedSmsList[position]
-        val sms = card.unresolvedSms
 
-        holder.unresolvedSmsCard = card
-        holder.sender.text = sms.sender
-        holder.body.text = sms.body
-        holder.time.text = SimpleDateFormat.getDateTimeInstance().format(Date(sms.dateInMillis))
-        holder.filterSpinner.adapter = FiltersSpinnerAdapter(holder.itemView.context, card.filters.toMutableList().apply {
-            add(0, Filter(null, "None"))
-        })
+        holder.bind(card)
     }
 
     fun getList() = unresolvedSmsList
@@ -107,16 +100,27 @@ private class RVAdapter(private var unresolvedSmsList: List<UnresolvedSmsCard>) 
     }
 
     private inner class VH(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
-        val applyButton = itemView.findViewById<Button>(R.id.applyButton)!!
-        val sender = itemView.findViewById<TextView>(R.id.sender)!!
-        val body = itemView.findViewById<TextView>(R.id.body)!!
-        val filterSpinner = itemView.findViewById<Spinner>(R.id.filterSelection)!!
-        val time = itemView.findViewById<TextView>(R.id.time)!!
+        private val applyButton = itemView.findViewById<Button>(R.id.applyButton)!!
+        private val sender = itemView.findViewById<TextView>(R.id.sender)!!
+        private val body = itemView.findViewById<TextView>(R.id.body)!!
+        private val filterSpinner = itemView.findViewById<Spinner>(R.id.filterSelection)!!
+        private val time = itemView.findViewById<TextView>(R.id.time)!!
 
         lateinit var unresolvedSmsCard: UnresolvedSmsCard
         lateinit var selectedBodyPattern: String
 
-        init {
+        fun bind(card: UnresolvedSmsCard) {
+            unresolvedSmsCard = card
+
+            val sms = card.unresolvedSms
+
+            sender.text = sms.sender
+            body.text = sms.body
+            time.text = SimpleDateFormat.getDateTimeInstance().format(Date(sms.dateInMillis))
+            filterSpinner.adapter = FiltersSpinnerAdapter(itemView.context, card.filters.toMutableList().apply {
+                add(0, Filter(null, "None"))
+            })
+
             applyButton.setOnClickListener(this)
 
             filterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {

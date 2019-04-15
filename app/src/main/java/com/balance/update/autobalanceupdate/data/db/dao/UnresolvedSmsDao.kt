@@ -12,10 +12,10 @@ interface UnresolvedSmsDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     fun insert(unresolvedSms: UnresolvedSms): Single<Long>
 
-    @Query("SELECT * FROM UnresolvedSms ORDER BY dateInMillis")
+    @Query("SELECT * FROM UnresolvedSms ORDER BY dateInMillis DESC")
     fun loadAll(): Single<List<UnresolvedSms>>
 
-    @Query("SELECT * FROM UnresolvedSms ORDER BY dateInMillis")
+    @Query("SELECT * FROM UnresolvedSms ORDER BY dateInMillis DESC")
     fun subscribeAll(): Observable<List<UnresolvedSms>>
 
     @Query("SELECT * FROM UnresolvedSms WHERE `key` = :id LIMIT 1")

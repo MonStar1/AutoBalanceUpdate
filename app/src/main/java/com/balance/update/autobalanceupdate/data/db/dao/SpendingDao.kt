@@ -11,13 +11,13 @@ interface SpendingDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     fun insert(entity: Spending): Single<Long>
 
-    @Query("SELECT * FROM Spending ORDER BY dateInMillis")
+    @Query("SELECT * FROM Spending ORDER BY dateInMillis DESC")
     fun subscribeAll(): Observable<List<Spending>>
 
-    @Query("SELECT * FROM Spending ORDER BY dateInMillis")
+    @Query("SELECT * FROM Spending ORDER BY dateInMillis DESC")
     fun loadAll(): Single<List<Spending>>
 
-    @Query("SELECT *, (SELECT sender FROM SmsPattern) as sender FROM Spending WHERE (SELECT filterId FROM SmsPattern WHERE smsPatternId = SmsPattern.`key`) = :filterId  ORDER BY dateInMillis")
+    @Query("SELECT *, (SELECT sender FROM SmsPattern) as sender FROM Spending WHERE (SELECT filterId FROM SmsPattern WHERE smsPatternId = SmsPattern.`key`) = :filterId  ORDER BY dateInMillis DESC")
     fun subscribeByFilterId(filterId: Int): Observable<List<Spending>>
 
     @Delete
