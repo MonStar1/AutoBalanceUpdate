@@ -2,6 +2,8 @@ package com.balance.update.autobalanceupdate
 
 import android.app.Application
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.balance.update.autobalanceupdate.data.db.AppDatabase
 
 class App : Application() {

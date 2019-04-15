@@ -3,6 +3,7 @@ package com.balance.update.autobalanceupdate.data.db.entities
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(foreignKeys = [ForeignKey(entity = Filter::class, parentColumns = ["key"], childColumns = ["filterId"], onDelete = ForeignKey.RESTRICT)])

@@ -14,7 +14,7 @@ class PriorbankSmsParser(val body: String) : SmsParser {
         if (matcher.matches()) {
             return matcher.group(1).toDouble()
         } else {
-            throw SmsParseException("Unknown Priorbank sms type")
+            return 0.0
         }
     }
 }

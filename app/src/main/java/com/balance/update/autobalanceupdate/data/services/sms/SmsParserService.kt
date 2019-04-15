@@ -25,7 +25,7 @@ class SmsParserService : IntentService("SmsService") {
 
     override fun onHandleIntent(intent: Intent) {
         Telephony.Sms.Intents.getMessagesFromIntent(intent).forEach {
-            handleMessage(it.originatingAddress, it.messageBody, System.currentTimeMillis())
+            handleMessage(it.originatingAddress!!, it.messageBody, System.currentTimeMillis())
         }
     }
 
@@ -34,7 +34,7 @@ class SmsParserService : IntentService("SmsService") {
             return
         }
 
-        val disposable = ResolveNewSms().execute(ResolveSmsInput(sender, messageBody, timestampMillis))
+        ResolveNewSms().execute(ResolveSmsInput(sender, messageBody, timestampMillis))
                 .onErrorResumeNext {
                     LoadUnresolvedSms().execute(Unit)
                             .doOnSuccess {
