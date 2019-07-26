@@ -26,4 +26,32 @@ Spr.:5099999"""
 
         assertTrue(seller is Seller.Food)
     }
+
+    @Test
+    fun testAptekaSeller() {
+        var body = """KARTA 5*1635
+2019-07-25 11:31:30
+OPLATA 2.26BYN
+APTEKA N1 GRODNO BY
+OSTATOK 2.03BYN
+Spr.:5099999"""
+
+        val seller = MtbankSellerParser.getSeller(body)
+
+        assertTrue(seller is Seller.Health)
+    }
+
+    @Test
+    fun testAzsSeller() {
+        var body = """KARTA 5*1635
+2019-07-25 11:31:30
+OPLATA 2.26BYN
+AZS N1 GRODNO BY
+OSTATOK 2.03BYN
+Spr.:5099999"""
+
+        val seller = MtbankSellerParser.getSeller(body)
+
+        assertTrue(seller is Seller.Transport)
+    }
 }

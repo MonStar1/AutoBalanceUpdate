@@ -21,6 +21,8 @@ class SmsParserService : IntentService("SmsService") {
         const val HALVA_BALANCE_CELL = "C6"
         const val PRIOR_BALANCE_CELL = "C5"
         const val FOOD_CELL = "C9"
+        const val HEALTH_CELL = "C10"
+        const val TRANSPORT_CELL = "C11"
         const val BALANCE_SPREADSHEET = "15NfMZvT2qDM8Xja1GnqumkNd8sIEgDM2XbMNaWkJocQ"
         const val BALANCE_SHEET = "Sheet_1"
     }
@@ -77,6 +79,18 @@ class SmsParserService : IntentService("SmsService") {
                 val newBalance = balance - smsData.spent
 
                 sheetsApi.updateCell(FOOD_CELL, newBalance)
+            }
+            is Seller.Health -> {
+                val balance = sheetsApi.readCell(HEALTH_CELL).toDouble()
+                val newBalance = balance - smsData.spent
+
+                sheetsApi.updateCell(HEALTH_CELL, newBalance)
+            }
+            is Seller.Transport -> {
+                val balance = sheetsApi.readCell(TRANSPORT_CELL).toDouble()
+                val newBalance = balance - smsData.spent
+
+                sheetsApi.updateCell(TRANSPORT_CELL, newBalance)
             }
         }
     }
