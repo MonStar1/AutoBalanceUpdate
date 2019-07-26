@@ -3,8 +3,10 @@ package com.balance.update.autobalanceupdate.sms
 import android.app.IntentService
 import android.content.Intent
 import android.provider.Telephony
+import com.balance.update.autobalanceupdate.App
 import com.balance.update.autobalanceupdate.GoogleServiceAuth
 import com.balance.update.autobalanceupdate.extension.toastUI
+import com.balance.update.autobalanceupdate.room.LogEntity
 import com.balance.update.autobalanceupdate.sheets.SheetsApi
 import com.balance.update.autobalanceupdate.sms.parser.SmsData
 import com.balance.update.autobalanceupdate.sms.parser.SmsParseException
@@ -14,6 +16,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.util.ExponentialBackOff
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse
+import io.reactivex.schedulers.Schedulers
 
 class SmsParserService : IntentService("SmsService") {
 
@@ -55,6 +58,10 @@ class SmsParserService : IntentService("SmsService") {
             return
         }
 
+        App.db.logDao()
+                .insert(LogEntity(sender = smsData.sender.name, seller = smsData.seller.toString(), actualBalance = smsData.actualBalance, spent = smsData.spent))
+                .subscribeOn(Schedulers.io())
+                .subscribe()
 
         val sheetsApi = SheetsApi(googleAccountCredential).apply {
             selectSpreadsheetId(BALANCE_SPREADSHEET)

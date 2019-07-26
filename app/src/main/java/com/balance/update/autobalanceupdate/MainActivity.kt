@@ -3,18 +3,27 @@ package com.balance.update.autobalanceupdate
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
 import com.balance.update.autobalanceupdate.extension.logd
 import com.balance.update.autobalanceupdate.extension.toast
+import com.balance.update.autobalanceupdate.room.LogEntity
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.android.synthetic.main.log_item.view.*
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.AppSettingsDialog
 
 
 class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, EasyPermissions.RationaleCallbacks {
 
-    lateinit var googleServiceAuth: GoogleServiceAuth;
+    lateinit var googleServiceAuth: GoogleServiceAuth
+    private val composDisposable = CompositeDisposable()
 
     companion object {
         const val SMS_PERMISSION = Manifest.permission.RECEIVE_SMS
@@ -58,6 +67,14 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
 //                // empty box, no SMS
 //            }
 //        }
+
+        App.db.logDao().getAll()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    recyclerView.adapter = LogAdapter(it)
+                }
+                .apply { composDisposable.addAll(this) }
     }
 
 
@@ -106,4 +123,29 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
         googleServiceAuth.onActivityResult(requestCode, resultCode, data)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+
+        composDisposable.clear()
+    }
+
+}
+
+private class LogAdapter(var data: List<LogEntity>) : RecyclerView.Adapter<LogAdapter.VH>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH = VH(View.inflate(parent.context, R.layout.log_item, parent))
+
+    override fun getItemCount() = data.size
+
+    override fun onBindViewHolder(holder: VH, position: Int) {
+        val item = data[position]
+
+        holder.itemView.seller.text = item.seller
+        holder.itemView.sender.text = item.sender
+        holder.itemView.spent.text = item.spent.toString()
+        holder.itemView.balance.text = item.actualBalance.toString()
+    }
+
+    inner class VH(view: View) : RecyclerView.ViewHolder(view) {
+
+    }
 }

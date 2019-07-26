@@ -71,7 +71,7 @@ class MtbankSellerParser {
                 append(")")
             }
 
-            return SmsParser.buildPattern("OPLATA", "BYN\\s$str")
+            return SmsParser.buildPattern("OPLATA", "BYN\\s.*$str")
         }
 
         private fun buildHealthPattern(): Pattern {
@@ -87,7 +87,7 @@ class MtbankSellerParser {
                 append(")")
             }
 
-            return SmsParser.buildPattern("OPLATA", "BYN\\s$str")
+            return SmsParser.buildPattern("OPLATA", "BYN\\s.*$str")
         }
 
         private fun buildTransportPattern(): Pattern {
@@ -103,7 +103,7 @@ class MtbankSellerParser {
                 append(")")
             }
 
-            return SmsParser.buildPattern("OPLATA", "BYN\\s$str")
+            return SmsParser.buildPattern("OPLATA", "BYN\\s.*$str")
         }
     }
 }
