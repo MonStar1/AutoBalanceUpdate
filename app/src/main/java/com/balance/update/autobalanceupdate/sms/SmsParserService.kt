@@ -58,10 +58,6 @@ class SmsParserService : IntentService("SmsService") {
             return
         }
 
-        App.db.logDao()
-                .insert(LogEntity(sender = smsData.sender.name, seller = smsData.seller.toString(), actualBalance = smsData.actualBalance, spent = smsData.spent))
-                .subscribeOn(Schedulers.io())
-                .subscribe()
 
         val sheetsApi = SheetsApi(googleAccountCredential).apply {
             selectSpreadsheetId(BALANCE_SPREADSHEET)
@@ -80,26 +76,34 @@ class SmsParserService : IntentService("SmsService") {
 
         toastUI(this, "updated: ${result.updatedRows}")
 
+        var balanceCell = 0.0
         when (smsData.seller) {
             is Seller.Food -> {
                 val balance = sheetsApi.readCell(FOOD_CELL).toDouble()
-                val newBalance = balance - smsData.spent
+                balanceCell = balance - smsData.spent
 
-                sheetsApi.updateCell(FOOD_CELL, newBalance)
+                sheetsApi.updateCell(FOOD_CELL, balanceCell)
             }
             is Seller.Health -> {
                 val balance = sheetsApi.readCell(HEALTH_CELL).toDouble()
-                val newBalance = balance - smsData.spent
+                balanceCell = balance - smsData.spent
 
-                sheetsApi.updateCell(HEALTH_CELL, newBalance)
+                sheetsApi.updateCell(HEALTH_CELL, balanceCell)
             }
             is Seller.Transport -> {
                 val balance = sheetsApi.readCell(TRANSPORT_CELL).toDouble()
-                val newBalance = balance - smsData.spent
+                balanceCell = balance - smsData.spent
 
-                sheetsApi.updateCell(TRANSPORT_CELL, newBalance)
+                sheetsApi.updateCell(TRANSPORT_CELL, balanceCell)
             }
         }
+
+        App.db.logDao()
+                .insert(LogEntity(sender = smsData.sender.name, seller = smsData.seller.toString(),
+                        actualBalance = smsData.actualBalance, spent = smsData.spent,
+                        categoryBalance = balanceCell, sellerText = smsData.sellerText))
+                .subscribeOn(Schedulers.io())
+                .subscribe()
     }
 
 }

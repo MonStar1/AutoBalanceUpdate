@@ -10,7 +10,7 @@ class MtbankSellerParserTest {
     fun testUnknown() {
         val seller = MtbankSellerParser.getSeller("WTF BYN")
 
-        assertTrue(seller is Seller.Unknown)
+        assertTrue(seller.first is Seller.Unknown)
     }
 
     @Test
@@ -24,7 +24,7 @@ Spr.:5099999"""
 
         val seller = MtbankSellerParser.getSeller(body)
 
-        assertTrue(seller is Seller.Food)
+        assertTrue(seller.first is Seller.Food)
     }
 
     @Test
@@ -38,7 +38,7 @@ Spr.:5099999"""
 
         val seller = MtbankSellerParser.getSeller(body)
 
-        assertTrue(seller is Seller.Health)
+        assertTrue(seller.first is Seller.Health)
     }
 
     @Test
@@ -52,6 +52,6 @@ Spr.:5099999"""
 
         val seller = MtbankSellerParser.getSeller(body)
 
-        assertTrue(seller is Seller.Transport)
+        assertTrue(seller.first is Seller.Transport)
     }
 }

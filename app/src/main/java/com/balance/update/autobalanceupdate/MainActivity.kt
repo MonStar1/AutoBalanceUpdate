@@ -3,9 +3,11 @@ package com.balance.update.autobalanceupdate
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.balance.update.autobalanceupdate.extension.logd
 import com.balance.update.autobalanceupdate.extension.toast
@@ -27,7 +29,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
 
     companion object {
         const val SMS_PERMISSION = Manifest.permission.RECEIVE_SMS
-        const val RC_RECEIVE_SMS = 111;
+        const val RC_RECEIVE_SMS = 111
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +44,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
 
         googleServiceAuth = GoogleServiceAuth(this, object : GoogleServiceAuthListener {
             override fun signedIn(account: GoogleSignInAccount) {
-                textView.setText("Name: ${account.displayName}")
+                textView.text = "Name: ${account.displayName}"
             }
         })
 
@@ -67,6 +69,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
 //                // empty box, no SMS
 //            }
 //        }
+        
 
         App.db.logDao().getAll()
                 .subscribeOn(Schedulers.io())
@@ -132,7 +135,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
 }
 
 private class LogAdapter(var data: List<LogEntity>) : RecyclerView.Adapter<LogAdapter.VH>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH = VH(View.inflate(parent.context, R.layout.log_item, parent))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH = VH(LayoutInflater.from(parent.context).inflate(R.layout.log_item, parent, false))
 
     override fun getItemCount() = data.size
 
@@ -143,9 +146,9 @@ private class LogAdapter(var data: List<LogEntity>) : RecyclerView.Adapter<LogAd
         holder.itemView.sender.text = item.sender
         holder.itemView.spent.text = item.spent.toString()
         holder.itemView.balance.text = item.actualBalance.toString()
+        holder.itemView.balanceCategory.text = item.categoryBalance.toString()
+        holder.itemView.sellerText.text = item.sellerText
     }
 
-    inner class VH(view: View) : RecyclerView.ViewHolder(view) {
-
-    }
+    inner class VH(view: View) : RecyclerView.ViewHolder(view)
 }

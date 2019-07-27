@@ -11,7 +11,7 @@ class MtbankSmsParser(val body: String) : SmsParser {
         val balance = getActualBalance()
         val seller = MtbankSellerParser.getSeller(body)
 
-        return SmsData(SmsSender.Mtbank(), seller, spent, balance)
+        return SmsData(SmsSender.Mtbank(), seller.first, spent, balance, seller.second)
     }
 
     private fun getSpent(): Double {
@@ -42,19 +42,16 @@ class MtbankSellerParser {
         val HEALTH_ARRAY = arrayOf("APTEKA", "SYNEVO")
         val TRANSPORT_ARRAY = arrayOf("AZS", "Taxi")
 
-        fun getSeller(body: String): Seller {
-            val food = buildFoodPattern()
-            val health = buildHealthPattern()
-            val transport = buildTransportPattern()
+        fun getSeller(body: String): Pair<Seller, String> {
+            val food = buildFoodPattern().matcher(body)
+            val health = buildHealthPattern().matcher(body)
+            val transport = buildTransportPattern().matcher(body)
 
-            if (food.matcher(body).find()) {
-                return Seller.Food
-            } else if (health.matcher(body).find()) {
-                return Seller.Health
-            } else if (transport.matcher(body).find()) {
-                return Seller.Transport
-            } else {
-                return Seller.Unknown
+            when {
+                food.find() -> return Pair(Seller.Food, food.group(2))
+                health.find() -> return Pair(Seller.Health, health.group(2))
+                transport.find() -> return Pair(Seller.Transport, transport.group(2))
+                else -> return Pair(Seller.Unknown, "Unknown")
             }
         }
 

@@ -21,7 +21,7 @@ interface SmsParser {
     }
 }
 
-data class SmsData(val sender: SmsSender, val seller: Seller, val spent: Double, val actualBalance: Double)
+data class SmsData(val sender: SmsSender, val seller: Seller, val spent: Double, val actualBalance: Double, val sellerText : String)
 
 
 class SmsParseException(message: String = "Incorrect type of sms") : Exception(message)

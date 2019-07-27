@@ -9,5 +9,7 @@ data class LogEntity(
         val sender: String,
         val seller: String,
         val spent: Double,
-        val actualBalance: Double
+        val actualBalance: Double,
+        val categoryBalance : Double,
+        val sellerText: String
 )
