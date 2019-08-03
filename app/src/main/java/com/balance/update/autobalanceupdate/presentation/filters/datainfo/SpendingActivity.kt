@@ -64,10 +64,6 @@ class SpendingActivity : BasePresenterActivity<SpendingView>(), SpendingView {
         loge(Exception(error))
     }
 
-    override fun showProgress(isVisible: Boolean) {
-        progress.visibility = if (isVisible) View.VISIBLE else View.GONE
-    }
-
     override fun setSpendingList(list: List<SpendingWithPattern>) {
         adapter.setSpendingList(list)
     }

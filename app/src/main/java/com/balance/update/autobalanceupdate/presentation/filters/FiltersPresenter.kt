@@ -7,6 +7,7 @@ import com.balance.update.autobalanceupdate.presentation.BasePresenter
 import com.balance.update.autobalanceupdate.presentation.MvpView
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import java.util.concurrent.TimeUnit
 
 interface FilterView : MvpView {
     fun setFilters(arrayOfFilters: List<Filter>)

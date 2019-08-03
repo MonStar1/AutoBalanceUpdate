@@ -10,8 +10,8 @@ class FilterRepository {
 
     private val dao = App.db.getFilterDao()
 
-    fun create(filterName: String): Single<Long> {
-        return dao.insert(Filter(filterName = filterName))
+    fun create(filterName: String, filterId : Int? = null): Single<Long> {
+        return dao.insert(Filter(key = filterId, filterName = filterName))
     }
 
     fun subscribeAll(): Observable<List<Filter>> {

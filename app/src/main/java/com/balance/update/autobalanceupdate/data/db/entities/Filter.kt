@@ -20,8 +20,7 @@ data class Filter(
             parcel.readValue(Int::class.java.classLoader) as? Int,
             parcel.readString(),
             parcel.readDouble(),
-            parcel.readString()) {
-    }
+            parcel.readString())
 
     override fun toString(): String {
         return filterName
@@ -68,7 +67,4 @@ class FilterDiffCallback(private val oldListFilter: List<Filter>, private val ne
         return oldListFilter[oldItemPosition] == newListFilter[newItemPosition]
     }
 
-    override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
-        return super.getChangePayload(oldItemPosition, newItemPosition)
-    }
 }

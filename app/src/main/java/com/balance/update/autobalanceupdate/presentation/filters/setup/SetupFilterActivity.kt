@@ -65,10 +65,6 @@ class SetupFilterActivity : BasePresenterActivity<SetupFilterView>(), SetupFilte
         loge(Exception(error))
     }
 
-    override fun showProgress(isVisible: Boolean) {
-        progress.visibility = if (isVisible) View.VISIBLE else View.GONE
-    }
-
     override fun setSmsPatterns(smsPatterns: List<SmsPattern>) {
         adapter.setSmsPatterns(smsPatterns)
     }

@@ -2,35 +2,33 @@ package com.balance.update.autobalanceupdate.presentation.filters
 
 import android.content.Intent
 import android.util.Log
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
-import com.archit.calendardaterangepicker.customviews.DateRangeCalendarView
 import com.balance.update.autobalanceupdate.R
 import com.balance.update.autobalanceupdate.data.db.entities.Filter
-import com.balance.update.autobalanceupdate.data.db.entities.FilterDiffCallback
 import com.balance.update.autobalanceupdate.data.memory.DateRange
 import com.balance.update.autobalanceupdate.extension.toast
 import com.balance.update.autobalanceupdate.presentation.BasePresenterActivity
+import com.balance.update.autobalanceupdate.presentation.filters.adapter.RVAdapter
 import com.balance.update.autobalanceupdate.presentation.filters.datainfo.SpendingActivity
 import com.balance.update.autobalanceupdate.presentation.unresolved.UnresolvedSmsActivity
+import com.balance.update.autobalanceupdate.presentation.widget.CalendarDialogFragment
 import com.balance.update.autobalanceupdate.presentation.widget.SwipeToDelete
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_filters.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class FiltersActivity : BasePresenterActivity<FilterView>(), FilterView {
+class FiltersActivity : BasePresenterActivity<FilterView>(), FilterView, CalendarDialogFragment.SelectDateCallback {
 
     override val presenter = FiltersPresenter()
     private val adapter = RVAdapter(listOf())
-    private var calendarPair: Pair<Calendar, Calendar>? = null
+    private var calendarRange: CalendarRange? = null
     override val layoutId = R.layout.activity_filters
 
     override fun doOnCreate() {
@@ -71,10 +69,6 @@ class FiltersActivity : BasePresenterActivity<FilterView>(), FilterView {
         Log.e("Exception_logoff", error.localizedMessage, error)
     }
 
-    override fun showProgress(isVisible: Boolean) {
-        progress.visibility = if (isVisible) View.VISIBLE else View.GONE
-    }
-
     override fun setDateRange(dateRange: DateRange) {
         val startCalendar = Calendar.getInstance().apply {
             timeInMillis = dateRange.startDate
@@ -87,7 +81,7 @@ class FiltersActivity : BasePresenterActivity<FilterView>(), FilterView {
         val startString = SimpleDateFormat.getDateInstance().format(startCalendar.time)
         val endString = SimpleDateFormat.getDateInstance().format(endCalendar.time)
 
-        calendarPair = Pair(startCalendar, endCalendar)
+        calendarRange = Pair(startCalendar, endCalendar)
 
         dateRangeTextView.text = getString(R.string.template_range_date, startString, endString)
     }
@@ -124,73 +118,58 @@ class FiltersActivity : BasePresenterActivity<FilterView>(), FilterView {
                 return true
             }
             R.id.action_select_date -> {
-                val calendarView =
-                        DateRangeCalendarView(this).apply {
-                            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-                            calendarPair?.let { this.setSelectedDateRange(it.first, it.second) }
-                        }
+                calendarRange?.let {
+                    CalendarDialogFragment.newInstance(it.first, it.second).show(supportFragmentManager, null)
+                }
 
-                AlertDialog.Builder(this)
-                        .setView(calendarView)
-                        .setPositiveButton(android.R.string.ok) { _, _ ->
-                            presenter.setSelectedDateRange(calendarView.startDate.timeInMillis, calendarView.endDate.timeInMillis)
-                        }
-                        .setNegativeButton(android.R.string.cancel, null)
-                        .setTitle("Select date range:")
-                        .show()
+//                val picker = SublimePicker(this).apply {
+//                    layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+//                    initializePicker(SublimeOptions().apply {
+//                        setDisplayOptions(ACTIVATE_DATE_PICKER)
+//                        setCanPickDateRange(true)
+//                    }, object : SublimeListenerAdapter() {
+//                        override fun onDateTimeRecurrenceSet(sublimeMaterialPicker: SublimePicker?, selectedDate: SelectedDate?, hourOfDay: Int, minute: Int, recurrenceOption: SublimeRecurrencePicker.RecurrenceOption?, recurrenceRule: String?) {
+//                            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//                        }
+//
+//                        override fun onCancelled() {
+//                            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//                        }
+//                    })
+//
+//                }
+//
+//                AlertDialog.Builder(this)
+//                        .setView(picker)
+//                        .setPositiveButton(android.R.string.ok) { _, _ ->
+//                            //                            presenter.setSelectedDateRange(calendarView.startDate.timeInMillis, calendarView.endDate.timeInMillis)
+//                        }
+//                        .setNegativeButton(android.R.string.cancel, null)
+//                        .setTitle("Select date range:")
+//                        .show()
+//                val calendarView =
+//                        DateRangeCalendarView(this).apply {
+//                            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+//                            calendarRange?.let { this.setSelectedDateRange(it.first, it.second) }
+//                        }
+//
+//                AlertDialog.Builder(this)
+//                        .setView(calendarView)
+//                        .setPositiveButton(android.R.string.ok) { _, _ ->
+//                            presenter.setSelectedDateRange(calendarView.startDate.timeInMillis, calendarView.endDate.timeInMillis)
+//                        }
+//                        .setNegativeButton(android.R.string.cancel, null)
+//                        .setTitle("Select date range:")
+//                        .show()
             }
         }
         return super.onOptionsItemSelected(item)
     }
-}
 
-
-private class RVAdapter(private var filters: List<Filter>) : RecyclerView.Adapter<RVAdapter.VH>() {
-
-    var onFilterClickedListener: OnFilterClickedListener? = null
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-        return VH(LayoutInflater.from(parent.context).inflate(R.layout.view_filter, parent, false))
-    }
-
-    override fun getItemCount(): Int {
-        return filters.size
-    }
-
-    override fun onBindViewHolder(holder: VH, position: Int) {
-        val filter = filters[position]
-
-        holder.filter = filter
-        holder.filterName.text = filter.filterName
-
-        holder.spentLabel.text = holder.itemView.context.getString(R.string.template_amount_with_currency, filter.spent, filter.currency)
-    }
-
-    fun setFilters(filters: List<Filter>) {
-        val callback = FilterDiffCallback(this.filters, filters)
-        val diffResult = DiffUtil.calculateDiff(callback, true)
-
-        this.filters = filters
-        diffResult.dispatchUpdatesTo(this)
-    }
-
-    fun getItemByPosition(position: Int): Filter {
-        return filters[position]
-    }
-
-    private inner class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val filterName = itemView.findViewById<TextView>(R.id.name)!!
-        val spentLabel = itemView.findViewById<TextView>(R.id.spentLabel)!!
-        lateinit var filter: Filter
-
-        init {
-            itemView.setOnClickListener {
-                onFilterClickedListener?.onFilterClicked(filter)
-            }
-        }
-    }
-
-    interface OnFilterClickedListener {
-        fun onFilterClicked(filter: Filter)
+    override fun onRangeSelected(startDate: Calendar, endDate: Calendar) {
+        presenter.setSelectedDateRange(startDate.timeInMillis, endDate.timeInMillis)
     }
 }
+
+typealias CalendarRange = Pair<Calendar, Calendar>
+

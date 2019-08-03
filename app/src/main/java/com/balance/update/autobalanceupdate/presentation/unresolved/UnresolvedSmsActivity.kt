@@ -55,10 +55,6 @@ class UnresolvedSmsActivity : BasePresenterActivity<UnresolvedSmsView>(), Unreso
         toast(this, error)
     }
 
-    override fun showProgress(isVisible: Boolean) {
-        progress.visibility = if (isVisible) View.VISIBLE else View.GONE
-    }
-
     override fun showNotification(countOfNotifications: Int) {
         notification.show(countOfNotifications)
     }

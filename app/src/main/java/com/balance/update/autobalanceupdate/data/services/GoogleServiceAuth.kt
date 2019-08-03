@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import com.balance.update.autobalanceupdate.extension.loge
 import com.balance.update.autobalanceupdate.extension.toast
-import com.balance.update.autobalanceupdate.presentation.filters.FiltersActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -37,7 +36,7 @@ class GoogleServiceAuth(val activity: Activity, val listener: GoogleServiceAuthL
         activity.startActivityForResult(googleSignInClient.signInIntent, RQ_GOOGLE_SIGN_IN)
     }
 
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    fun onActivityResult(requestCode: Int, data: Intent?) {
         if (requestCode == RQ_GOOGLE_SIGN_IN) {
             val signedInAccountFromIntent = GoogleSignIn.getSignedInAccountFromIntent(data)
 

@@ -39,6 +39,8 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
         googleServiceAuth = GoogleServiceAuth(this, object : GoogleServiceAuthListener {
             override fun signedIn(account: GoogleSignInAccount) {
                 textView.text = "Name: ${account.displayName}"
+                startActivity(Intent(applicationContext, FiltersActivity::class.java))
+                finish()
             }
         })
 
@@ -72,9 +74,9 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
         toast(this@MainActivity, "Permission granted")
 
-        startActivity(Intent(this, FiltersActivity::class.java))
-        finish()
-//        googleServiceAuth.request()
+//        startActivity(Intent(this, FiltersActivity::class.java))
+//        finish()
+        googleServiceAuth.request()
     }
 
     override fun onRationaleDenied(requestCode: Int) {
@@ -95,7 +97,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
             onPermissionsGranted(RC_RECEIVE_SMS, mutableListOf(SMS_PERMISSION))
         }
 
-        googleServiceAuth.onActivityResult(requestCode, resultCode, data)
+        googleServiceAuth.onActivityResult(requestCode, data)
     }
 
 }
