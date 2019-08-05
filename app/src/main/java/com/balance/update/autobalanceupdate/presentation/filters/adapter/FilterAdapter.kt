@@ -9,8 +9,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.balance.update.autobalanceupdate.R
 import com.balance.update.autobalanceupdate.data.db.entities.Filter
 import com.balance.update.autobalanceupdate.data.db.entities.FilterDiffCallback
+import com.balance.update.autobalanceupdate.extension.gone
+import com.balance.update.autobalanceupdate.extension.invisible
+import com.balance.update.autobalanceupdate.extension.visible
 
-class RVAdapter(private var filters: List<Filter>) : RecyclerView.Adapter<RVAdapter.VH>() {
+class FilterAdapter(private var filters: List<Filter>) : RecyclerView.Adapter<FilterAdapter.VH>() {
 
     var onFilterClickedListener: OnFilterClickedListener? = null
 
@@ -29,6 +32,12 @@ class RVAdapter(private var filters: List<Filter>) : RecyclerView.Adapter<RVAdap
         holder.filterName.text = filter.filterName
 
         holder.spentLabel.text = holder.itemView.context.getString(R.string.template_amount_with_currency, filter.spent, filter.currency)
+
+        if (filter.spent == 0.0) {
+            holder.spentLabel.invisible()
+        } else {
+            holder.spentLabel.visible()
+        }
     }
 
     fun setFilters(filters: List<Filter>) {

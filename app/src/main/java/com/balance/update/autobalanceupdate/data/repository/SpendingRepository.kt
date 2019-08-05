@@ -10,9 +10,9 @@ class SpendingRepository {
 
     private val dao = App.db.getSpendingDao()
 
-    fun create(spent: Double,
-               currency: String,
-               balance: Double,
+    fun create(spent: Double?,
+               currency: String?,
+               balance: Double?,
                dateInMillis: Long,
                smsPatternId: Int): Single<Long> {
         return dao.insert(Spending(spent, currency, balance, dateInMillis, smsPatternId))

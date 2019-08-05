@@ -7,7 +7,7 @@ enum class Currency(val value: String) {
 
     companion object {
         fun getPattern(): String {
-            return Currency.values().joinToString("|", prefix = "(", postfix = ")")
+            return values().joinToString("|", prefix = "(", postfix = ")")
         }
     }
 }

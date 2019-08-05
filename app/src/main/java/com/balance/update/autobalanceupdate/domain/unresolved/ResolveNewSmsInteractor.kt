@@ -42,9 +42,10 @@ class TryResolveExistsUnresolvedSms : CompletableInteractor<List<UnresolvedSms>>
                                         sms.dateInMillis,
                                         it
                                 ))
-                                        .andThen(DeleteUnresolvedSms().attach(sms))
-                                        .onErrorComplete()
-                            }.onErrorComplete()
+                            }
+                            .andThen(DeleteUnresolvedSms().attach(sms))
+                            .onErrorComplete()
+                            .onErrorComplete()
 
                 }
     }

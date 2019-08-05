@@ -7,9 +7,9 @@ import androidx.room.PrimaryKey
 
 @Entity(foreignKeys = [ForeignKey(entity = SmsPattern::class, parentColumns = ["key"], childColumns = ["smsPatternId"], onDelete = ForeignKey.RESTRICT)])
 data class Spending(
-        val spent: Double,
-        val currency: String,
-        val balance: Double,
+        val spent: Double?,
+        val currency: String?,
+        val balance: Double?,
         val dateInMillis: Long,
         val smsPatternId: Int,
         val sender: String = "",

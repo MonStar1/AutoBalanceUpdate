@@ -14,7 +14,7 @@ import com.balance.update.autobalanceupdate.data.db.entities.Filter
 import com.balance.update.autobalanceupdate.data.memory.DateRange
 import com.balance.update.autobalanceupdate.extension.toast
 import com.balance.update.autobalanceupdate.presentation.BasePresenterActivity
-import com.balance.update.autobalanceupdate.presentation.filters.adapter.RVAdapter
+import com.balance.update.autobalanceupdate.presentation.filters.adapter.FilterAdapter
 import com.balance.update.autobalanceupdate.presentation.filters.datainfo.SpendingActivity
 import com.balance.update.autobalanceupdate.presentation.unresolved.UnresolvedSmsActivity
 import com.balance.update.autobalanceupdate.presentation.widget.CalendarDialogFragment
@@ -27,7 +27,7 @@ import java.util.*
 class FiltersActivity : BasePresenterActivity<FilterView>(), FilterView, CalendarDialogFragment.SelectDateCallback {
 
     override val presenter = FiltersPresenter()
-    private val adapter = RVAdapter(listOf())
+    private val adapter = FilterAdapter(listOf())
     private var calendarRange: CalendarRange? = null
     override val layoutId = R.layout.activity_filters
 
@@ -53,7 +53,7 @@ class FiltersActivity : BasePresenterActivity<FilterView>(), FilterView, Calenda
             createNewFilter()
         }
 
-        adapter.onFilterClickedListener = object : RVAdapter.OnFilterClickedListener {
+        adapter.onFilterClickedListener = object : FilterAdapter.OnFilterClickedListener {
             override fun onFilterClicked(filter: Filter) {
                 SpendingActivity.newInstance(this@FiltersActivity, filter)
             }

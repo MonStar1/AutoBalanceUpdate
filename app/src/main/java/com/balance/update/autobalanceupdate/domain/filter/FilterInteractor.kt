@@ -10,7 +10,7 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 
-private const val FILTER_IGNORE_KEY = -1
+const val FILTER_IGNORE_KEY = -1993
 
 private val repository = FilterRepository()
 

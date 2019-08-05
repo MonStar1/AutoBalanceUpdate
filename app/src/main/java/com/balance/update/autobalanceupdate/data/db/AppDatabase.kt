@@ -13,7 +13,7 @@ import com.balance.update.autobalanceupdate.data.db.entities.SmsPattern
 import com.balance.update.autobalanceupdate.data.db.entities.Spending
 import com.balance.update.autobalanceupdate.data.db.entities.UnresolvedSms
 
-@Database(entities = [Filter::class, UnresolvedSms::class, SmsPattern::class, Spending::class], version = 12)
+@Database(entities = [Filter::class, UnresolvedSms::class, SmsPattern::class, Spending::class], version = 13)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 

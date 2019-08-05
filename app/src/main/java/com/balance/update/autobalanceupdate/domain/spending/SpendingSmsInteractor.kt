@@ -10,11 +10,10 @@ import com.balance.update.autobalanceupdate.data.services.sms.parser.Currency
 import com.balance.update.autobalanceupdate.data.services.sms.parser.SmsData
 import com.balance.update.autobalanceupdate.domain.CompletableInteractor
 import com.balance.update.autobalanceupdate.domain.ObservableInteractor
-import com.balance.update.autobalanceupdate.domain.SingleInteractor
 import com.balance.update.autobalanceupdate.domain.currency.ConvertCurrency
 import com.balance.update.autobalanceupdate.domain.currency.CurrencyInput
+import com.balance.update.autobalanceupdate.domain.filter.FILTER_IGNORE_KEY
 import com.balance.update.autobalanceupdate.domain.unresolved.LoadSmsPatternById
-import com.balance.update.autobalanceupdate.domain.unresolved.SubscribeSmsPattern
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -27,6 +26,16 @@ class SaveSpendingSms : CompletableInteractor<SpendingInput>() {
     private val repository = SpendingRepository()
 
     override fun buildCase(params: SpendingInput): Completable {
+        if (params.smsPattern.filterId == FILTER_IGNORE_KEY) {
+            return repository.create(
+                    null,
+                    null,
+                    null,
+                    params.dateInMillis,
+                    params.smsPattern.key!!
+            ).ignoreElement()
+        }
+
         return Single.create<SmsData> {
             val smsData = SmsParserFactory(params.sender, params.body).getParser().parse()
 
