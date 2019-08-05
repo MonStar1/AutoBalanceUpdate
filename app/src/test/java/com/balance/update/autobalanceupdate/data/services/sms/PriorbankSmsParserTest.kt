@@ -1,5 +1,6 @@
 package com.balance.update.autobalanceupdate.data.services.sms
 
+import com.balance.update.autobalanceupdate.data.services.sms.parser.Currency
 import com.balance.update.autobalanceupdate.data.services.sms.parser.PriorbankSmsParser
 import com.balance.update.autobalanceupdate.data.services.sms.parser.SmsParseException
 import org.junit.Test
@@ -51,5 +52,16 @@ class PriorbankSmsParserTest {
         parser = PriorbankSmsParser("Other text")
 
         val result = parser.parse()
+    }
+
+    @Test
+    fun parse_spent() {
+        parser = PriorbankSmsParser("Oplata 16.55 BYN. BLR UNIVERSAM ALMI Dostupno:100.1 BYN")
+
+        val result = parser.parse()
+
+        assertEquals(100.1, result.actualBalance, 0.0)
+        assertEquals(16.55, result.spent.amount, 0.0)
+        assertEquals(Currency.BYN, result.spent.currency)
     }
 }
