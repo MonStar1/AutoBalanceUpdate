@@ -38,7 +38,17 @@ class MtbankSmsParser(val body: String) : SmsParser {
 class MtbankSellerParser {
 
     companion object {
-        val FOOD_ARRAY = arrayOf("SHOP\\s\"SOSEDI\"", "SHOP\\s\"KORONA\"", "SHOP\\s\"EVROOPT\"", "UNIVERSAM", "\"BELMARKET\"", "\"ALMI\"", "SHOP\\sVESTA", "PT\\sMAGAZIN", "BREST")
+        val FOOD_ARRAY = arrayOf("SHOP\\s\"SOSEDI\"",
+                "SHOP\\s\"KORONA\"",
+                "SHOP\\s\"EVROOPT\"",
+                "UNIVERSAM",
+                "\"BELMARKET\"",
+                "\"ALMI\"",
+                "SHOP\\sVESTA",
+                "INDURSK",
+                "SOLNESHNY",
+                "BREST")
+
         val HEALTH_ARRAY = arrayOf("APTEKA", "SYNEVO")
         val TRANSPORT_ARRAY = arrayOf("AZS", "Taxi")
 
