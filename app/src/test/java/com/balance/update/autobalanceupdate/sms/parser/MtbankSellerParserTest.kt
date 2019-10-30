@@ -18,7 +18,7 @@ class MtbankSellerParserTest {
         var body = """KARTA:5351*1635
 18/08/18 13:56
 OPLATA 15.86 BYN
-PT SHOP "SOSEDI", , MINSK
+PT CT "KORONA", , MINSK
 OSTATOK 123.39 BYN
 Spr.:5099999"""
 
