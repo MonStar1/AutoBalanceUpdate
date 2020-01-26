@@ -2,6 +2,7 @@ package com.balance.update.autobalanceupdate.sms
 
 import com.balance.update.autobalanceupdate.sms.parser.MtbankSellerParser
 import com.balance.update.autobalanceupdate.sms.parser.MtbankSmsParser
+import com.balance.update.autobalanceupdate.sms.parser.SmsData
 import com.balance.update.autobalanceupdate.sms.parser.SmsParseException
 import com.balance.update.autobalanceupdate.sms.seller.Seller
 import org.junit.Test
@@ -16,7 +17,7 @@ class MtbankSmsParserTest {
     fun parse_1() {
         parser = MtbankSmsParser("OPLATA10BYN OSTATOK100.00BYN")
 
-        val result = parser.parse()
+        val result = parser.parse() as SmsData.SmsSpent
 
         assertEquals(100.0, result.actualBalance, 0.0)
         assertEquals(10.0, result.spent, 0.0)
@@ -26,7 +27,7 @@ class MtbankSmsParserTest {
     fun parse_2() {
         parser = MtbankSmsParser("OPLATA 10.1 BYN OSTATOK 100.99BYN")
 
-        val result = parser.parse()
+        val result = parser.parse() as SmsData.SmsSpent
 
         assertEquals(10.1, result.spent, 0.0)
         assertEquals(100.99, result.actualBalance, 0.0)
@@ -36,7 +37,7 @@ class MtbankSmsParserTest {
     fun parse_3() {
         parser = MtbankSmsParser("OSTATOK 100.01 BYN")
 
-        val result = parser.parse()
+        val result = parser.parse() as SmsData.SmsSpent
 
         assertEquals(100.01, result.actualBalance, 0.0)
     }
@@ -45,7 +46,7 @@ class MtbankSmsParserTest {
     fun parse_4() {
         parser = MtbankSmsParser("OSTATOK100.1 BYN")
 
-        val result = parser.parse()
+        val result = parser.parse() as SmsData.SmsSpent
 
         assertEquals(100.1, result.actualBalance, 0.0)
     }
@@ -61,7 +62,7 @@ class MtbankSmsParserTest {
     fun parse_6() {
         parser = MtbankSmsParser("OSTATOK 1 BYN")
 
-        val result = parser.parse()
+        val result = parser.parse() as SmsData.SmsSpent
 
         assertEquals(1.0, result.actualBalance, 0.0)
     }
@@ -75,7 +76,7 @@ class MtbankSmsParserTest {
     OSTATOK 62.37 BYN
     Spr.:5099999""")
 
-        val result = parser.parse()
+        val result = parser.parse() as SmsData.SmsSpent
 
         assertEquals(62.37, result.actualBalance, 6.90)
     }

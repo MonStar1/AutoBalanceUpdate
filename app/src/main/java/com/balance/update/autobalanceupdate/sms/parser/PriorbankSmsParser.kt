@@ -3,10 +3,14 @@ package com.balance.update.autobalanceupdate.sms.parser
 import com.balance.update.autobalanceupdate.sms.SmsSender
 import com.balance.update.autobalanceupdate.sms.seller.Seller
 
-class PriorbankSmsParser(val body: String) : SmsParser {
+class PriorbankSmsParser(private val body: String) : SmsParser {
 
     override fun parse(): SmsData {
-        return SmsData(SmsSender.PriorBank(), Seller.Unknown, 0.0, getActualBalance(), "Prior")
+        return if (getPerevod() != 0.0) {
+            SmsData.SmsExchange(SmsSender.PriorBank(), getPerevod(), getActualBalance())
+        } else {
+            SmsData.SmsSpent(SmsSender.PriorBank(), Seller.Unknown, 0.0, getActualBalance(), "Prior")
+        }
     }
 
     private fun getActualBalance(): Double {
@@ -16,6 +20,16 @@ class PriorbankSmsParser(val body: String) : SmsParser {
             return matcher.group(1).toDouble()
         } else {
             throw SmsParseException("Unknown Priorbank sms type")
+        }
+    }
+
+    private fun getPerevod(): Double {
+        val matcher = buildPattern("Zachislenie perevoda", "USD").matcher(body)
+
+        if (matcher.matches()) {
+            return matcher.group(1).toDouble()
+        } else {
+            return 0.0
         }
     }
 }
