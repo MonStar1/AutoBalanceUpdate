@@ -28,6 +28,7 @@ class SmsParserService : IntentService("SmsService") {
         const val TRANSPORT_CELL = "C11"
         const val CHANGED_USD_CELL = "C3"
         const val TO_SPEND_USD_CELL = "C4"
+        const val CASH_CELL = "C7"
         const val ON_THE_CARD_USD_CELL = "B37"
         const val BALANCE_SPREADSHEET = "15NfMZvT2qDM8Xja1GnqumkNd8sIEgDM2XbMNaWkJocQ"
         const val BALANCE_SHEET = "Sheet_1"
@@ -73,8 +74,31 @@ class SmsParserService : IntentService("SmsService") {
         when (smsData) {
             is SmsData.SmsSpent -> resolveSmsSpent(result, smsData, sheetsApi)
             is SmsData.SmsExchange -> resolveSmsExchange(smsData, sheetsApi)
+            is SmsData.SmsGetCash -> resolveSmsGetCash(smsData, sheetsApi)
         }
 
+    }
+
+    private fun resolveSmsGetCash(smsData: SmsData.SmsGetCash, sheetsApi: SheetsApi) {
+        when (smsData.sender) {
+            is SmsSender.PriorBank -> {
+                val cashBYN = sheetsApi.readCell(CASH_CELL).toDouble()
+
+                sheetsApi.updateCell(PRIOR_BALANCE_CELL, smsData.actualBalance)
+                sheetsApi.updateCell(CASH_CELL, cashBYN + smsData.cashBYN)
+
+                App.db.logDao()
+                        .insert(LogEntity(sender = smsData.sender.name, seller = "Unknown",
+                                actualBalance = smsData.actualBalance, spent = 0.0,
+                                categoryBalance = 0.0, sellerText = "Снятие наличных BYN ${smsData.cashBYN}"))
+                        .subscribeOn(Schedulers.io())
+                        .subscribe()
+            }
+            is SmsSender.Mtbank -> {
+            }
+            is SmsSender.Test -> {
+            }
+        }
     }
 
     private fun resolveSmsSpent(result: UpdateValuesResponse, smsSpent: SmsData.SmsSpent, sheetsApi: SheetsApi) {
@@ -112,7 +136,7 @@ class SmsParserService : IntentService("SmsService") {
         App.db.logDao()
                 .insert(LogEntity(sender = smsSpent.sender.name, seller = smsSpent.seller.toString(),
                         actualBalance = smsSpent.actualBalance, spent = smsSpent.spent,
-                        categoryBalance = balanceCell, sellerText = smsSpent.sellerText))
+                        categoryBalance = balanceCell, sellerText = "Prior"))
                 .subscribeOn(Schedulers.io())
                 .subscribe()
     }

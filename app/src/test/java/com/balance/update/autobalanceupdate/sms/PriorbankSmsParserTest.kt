@@ -58,6 +58,17 @@ class PriorbankSmsParserTest {
         assertEquals(100.00, result.exchangedUSD, 0.0)
     }
 
+    @Test
+    fun parse_Get_cash() {
+        val body = "Priorbank. Karta 4***7405 02-02-2020 18:39:46. Nalichnye v bankomate 75.00 BYN. BLR ATM 675. Dostupno: 167.99 BYN. Spravka: 80172899292"
+        parser = PriorbankSmsParser(body)
+
+        val result = parser.parse() as SmsData.SmsGetCash
+
+        assertEquals(167.99, result.actualBalance, 0.0)
+        assertEquals(75.00, result.cashBYN, 0.0)
+    }
+
     @Test(expected = SmsParseException::class)
     fun parse_5() {
         parser = PriorbankSmsParser("Other text")

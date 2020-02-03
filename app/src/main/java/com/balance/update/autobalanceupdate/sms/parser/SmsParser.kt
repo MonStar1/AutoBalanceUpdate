@@ -22,9 +22,11 @@ interface SmsParser {
 }
 
 sealed class SmsData {
-    data class SmsSpent(val sender: SmsSender, val seller: Seller, val spent: Double, val actualBalance: Double, val sellerText: String) : SmsData()
+    data class SmsSpent(val sender: SmsSender, val seller: Seller, val spent: Double, val actualBalance: Double) : SmsData()
 
     data class SmsExchange(val sender: SmsSender, val exchangedUSD: Double, val actualBalance: Double) : SmsData()
+
+    data class SmsGetCash(val sender: SmsSender, val cashBYN: Double, val actualBalance: Double) : SmsData()
 }
 
 
