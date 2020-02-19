@@ -56,6 +56,7 @@ class PriorbankSmsParserTest {
 
         assertEquals(292.20, result.actualBalance, 0.0)
         assertEquals(100.00, result.exchangedUSD, 0.0)
+        assertEquals("Priorbank", result.sender.name)
     }
 
     @Test

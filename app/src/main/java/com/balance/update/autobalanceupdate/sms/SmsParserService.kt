@@ -80,6 +80,8 @@ class SmsParserService : IntentService("SmsService") {
     }
 
     private fun resolveSmsGetCash(smsData: SmsData.SmsGetCash, sheetsApi: SheetsApi) {
+        toastUI(this, "Снятие наличных BYN ${smsData.cashBYN}")
+
         when (smsData.sender) {
             is SmsSender.PriorBank -> {
                 val cashBYN = sheetsApi.readCell(CASH_CELL).toDouble()
@@ -88,7 +90,7 @@ class SmsParserService : IntentService("SmsService") {
                 sheetsApi.updateCell(CASH_CELL, cashBYN + smsData.cashBYN)
 
                 App.db.logDao()
-                        .insert(LogEntity(sender = smsData.sender.name, seller = "Unknown",
+                        .insert(LogEntity(sender = smsData.sender.name, seller = "Банкомат",
                                 actualBalance = smsData.actualBalance, spent = 0.0,
                                 categoryBalance = 0.0, sellerText = "Снятие наличных BYN ${smsData.cashBYN}"))
                         .subscribeOn(Schedulers.io())
@@ -136,12 +138,14 @@ class SmsParserService : IntentService("SmsService") {
         App.db.logDao()
                 .insert(LogEntity(sender = smsSpent.sender.name, seller = smsSpent.seller.toString(),
                         actualBalance = smsSpent.actualBalance, spent = smsSpent.spent,
-                        categoryBalance = balanceCell, sellerText = "Prior"))
+                        categoryBalance = balanceCell, sellerText = "Spent"))
                 .subscribeOn(Schedulers.io())
                 .subscribe()
     }
 
     private fun resolveSmsExchange(smsExchange: SmsData.SmsExchange, sheetsApi: SheetsApi) {
+        toastUI(this, "Perevod USD $ ${smsExchange.exchangedUSD}")
+
         when (smsExchange.sender) {
             is SmsSender.PriorBank -> {
                 val changedUsd = sheetsApi.readCell(CHANGED_USD_CELL).toDouble()
@@ -154,7 +158,7 @@ class SmsParserService : IntentService("SmsService") {
                 sheetsApi.updateCell(ON_THE_CARD_USD_CELL, onCardUsd - smsExchange.exchangedUSD)
 
                 App.db.logDao()
-                        .insert(LogEntity(sender = smsExchange.sender.name, seller = "Unknown",
+                        .insert(LogEntity(sender = smsExchange.sender.name, seller = "Перевод",
                                 actualBalance = smsExchange.actualBalance, spent = 0.0,
                                 categoryBalance = 0.0, sellerText = "Perevod USD $ ${smsExchange.exchangedUSD}"))
                         .subscribeOn(Schedulers.io())
