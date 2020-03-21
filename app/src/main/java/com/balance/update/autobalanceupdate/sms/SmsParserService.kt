@@ -3,6 +3,7 @@ package com.balance.update.autobalanceupdate.sms
 import android.app.IntentService
 import android.content.Intent
 import android.provider.Telephony
+import android.widget.Toast
 import com.balance.update.autobalanceupdate.App
 import com.balance.update.autobalanceupdate.GoogleServiceAuth
 import com.balance.update.autobalanceupdate.extension.toastUI
@@ -17,6 +18,7 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.client.util.ExponentialBackOff
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse
 import io.reactivex.schedulers.Schedulers
+import java.lang.Exception
 
 class SmsParserService : IntentService("SmsService") {
 
@@ -26,6 +28,11 @@ class SmsParserService : IntentService("SmsService") {
         const val FOOD_CELL = "C9"
         const val HEALTH_CELL = "C10"
         const val TRANSPORT_CELL = "C11"
+        const val SWEET_CELL = "C13"
+        const val CAFE_CELL = "C15"
+        const val HOUSEHOLD_CELL = "C17"
+        const val CLOTHES_CELL = "C18"
+        const val CHILD_CELL = "C19"
         const val CHANGED_USD_CELL = "C3"
         const val TO_SPEND_USD_CELL = "C4"
         const val CASH_CELL = "C7"
@@ -37,7 +44,11 @@ class SmsParserService : IntentService("SmsService") {
 
     override fun onHandleIntent(intent: Intent) {
         Telephony.Sms.Intents.getMessagesFromIntent(intent).forEach {
-            handleMessage(it.originatingAddress, it.messageBody)
+            try {
+                handleMessage(it.originatingAddress, it.messageBody)
+            } catch (ex: Throwable) {
+                Toast.makeText(this, "Some excepion: ${ex.localizedMessage}", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -133,10 +144,40 @@ class SmsParserService : IntentService("SmsService") {
 
                 sheetsApi.updateCell(TRANSPORT_CELL, balanceCell)
             }
+            is Seller.Sweet -> {
+                val balance = sheetsApi.readCell(SWEET_CELL).toDouble()
+                balanceCell = balance - smsSpent.spent
+
+                sheetsApi.updateCell(SWEET_CELL, balanceCell)
+            }
+            is Seller.Cafe -> {
+                val balance = sheetsApi.readCell(CAFE_CELL).toDouble()
+                balanceCell = balance - smsSpent.spent
+
+                sheetsApi.updateCell(CAFE_CELL, balanceCell)
+            }
+            is Seller.Household -> {
+                val balance = sheetsApi.readCell(HOUSEHOLD_CELL).toDouble()
+                balanceCell = balance - smsSpent.spent
+
+                sheetsApi.updateCell(HOUSEHOLD_CELL, balanceCell)
+            }
+            is Seller.Clothes -> {
+                val balance = sheetsApi.readCell(CLOTHES_CELL).toDouble()
+                balanceCell = balance - smsSpent.spent
+
+                sheetsApi.updateCell(CLOTHES_CELL, balanceCell)
+            }
+            is Seller.Child -> {
+                val balance = sheetsApi.readCell(CHILD_CELL).toDouble()
+                balanceCell = balance - smsSpent.spent
+
+                sheetsApi.updateCell(CHILD_CELL, balanceCell)
+            }
         }
 
         App.db.logDao()
-                .insert(LogEntity(sender = smsSpent.sender.name, seller = smsSpent.seller.toString(),
+                .insert(LogEntity(sender = smsSpent.sender.name, seller = smsSpent.seller.name,
                         actualBalance = smsSpent.actualBalance, spent = smsSpent.spent,
                         categoryBalance = balanceCell, sellerText = "Spent"))
                 .subscribeOn(Schedulers.io())

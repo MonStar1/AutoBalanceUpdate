@@ -54,4 +54,18 @@ Spr.:5099999"""
 
         assertTrue(seller.first is Seller.Transport)
     }
+
+    @Test
+    fun testCafeSeller() {
+        var body = """KARTA 5*1635
+2020-03-21 14:22:22
+OPLATA 28.00 BYN
+SHOP"WWW.GOGOPIZZA.BY" / GRODNO / BY
+OSTATOK 225.78 BYN
+Spr.:5099999"""
+
+        val seller = MtbankSellerParser.getSeller(body)
+
+        assertTrue(seller.first is Seller.Cafe)
+    }
 }
