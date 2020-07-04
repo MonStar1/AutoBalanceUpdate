@@ -9,18 +9,34 @@ sealed class Seller(val name: String, val shopsArray: Array<String>) {
             "UNIVERSAM",
             "BELMARKET",
             "ALMI",
+            "VITALUR",
             "VESTA",
             "INDURSK",
             "SOLNESHNY",
             "GREEN",
             "SANTA",
+            "SUVOROVSKIY",
+            "SPADAR",
+            "E-DOSTAVKA",
             "BREST"))
 
     object Health : Seller("Health", arrayOf("APTEKA", "SYNEVO"))
     object Sweet : Seller("Sweet", arrayOf("KRASNYY PISCHEVIK", "KIOSK"))
     object Transport : Seller("Transport", arrayOf("AZS", "Taxi"))
-    object Cafe : Seller("Cafe", arrayOf("GOGOPIZZA", "KFC", "Dodo Pitstsa", "BARASHKA", "GO CAFE", "PROSTO KOFE", "MENU.BY"))
+    object Cafe : Seller("Cafe", arrayOf("GOGOPIZZA",
+            "KFC",
+            "TRDLO",
+            "GOU-GOU",
+            "DODO", "PIZZA", "BARASHKA", "GO CAFE", "PROSTO KOFE", "MENU.BY"))
+
     object Household : Seller("Household", arrayOf("MILA"))
-    object Clothes : Seller("Clothes", arrayOf("COLINS"))
-    object Child : Seller("Child", arrayOf("BUSLIK"))
+    object Clothes : Seller("Clothes", arrayOf(
+            "COLINS",
+            "GLORIA",
+            "BELWEST"
+    ))
+    object Child : Seller("Child", arrayOf(
+            "BUSLIK",
+            "PODGUZNIK"
+    ))
 }

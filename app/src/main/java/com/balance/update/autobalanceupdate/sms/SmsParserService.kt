@@ -36,7 +36,7 @@ class SmsParserService : IntentService("SmsService") {
         const val CHANGED_USD_CELL = "C3"
         const val TO_SPEND_USD_CELL = "C4"
         const val CASH_CELL = "C7"
-        const val ON_THE_CARD_USD_CELL = "B37"
+        const val ON_THE_CARD_USD_CELL = "B38"
         const val BALANCE_SPREADSHEET = "15NfMZvT2qDM8Xja1GnqumkNd8sIEgDM2XbMNaWkJocQ"
         const val BALANCE_SHEET = "Sheet_1"
     }
