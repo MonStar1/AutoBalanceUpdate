@@ -17,7 +17,7 @@ sealed class Seller(val name: String, val shopsArray: Array<String>) {
             "SANTA",
             "SUVOROVSKIY",
             "SPADAR",
-            "E-DOSTAVKA",
+            "E-DOSTA",
             "BREST"))
 
     object Health : Seller("Health", arrayOf("APTEKA", "SYNEVO"))
