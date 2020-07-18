@@ -9,7 +9,7 @@ sealed class Seller(val name: String, val shopsArray: Array<String>) {
             "UNIVERSAM",
             "BELMARKET",
             "ALMI",
-            "VITALUR",
+            "VIT",
             "VESTA",
             "INDURSK",
             "SOLNESHNY",
