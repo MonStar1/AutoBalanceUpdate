@@ -3,6 +3,7 @@ package com.balance.update.autobalanceupdate
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
+import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,7 @@ import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.log_item.view.*
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.AppSettingsDialog
+import java.util.*
 
 
 class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, EasyPermissions.RationaleCallbacks {
@@ -36,6 +38,10 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
+
+        recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL).apply {
+            setDrawable(getDrawable(R.drawable.divider))
+        })
 
         openBattery.setOnClickListener {
             val intentBatteryUsage = Intent(Intent.ACTION_POWER_USAGE_SUMMARY)
@@ -69,7 +75,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
 //                // empty box, no SMS
 //            }
 //        }
-        
+
 
         App.db.logDao().getAll()
                 .subscribeOn(Schedulers.io())
@@ -148,6 +154,9 @@ private class LogAdapter(var data: List<LogEntity>) : RecyclerView.Adapter<LogAd
         holder.itemView.balance.text = item.actualBalance.toString()
         holder.itemView.balanceCategory.text = item.categoryBalance.toString()
         holder.itemView.sellerText.text = item.sellerText
+        item.timeInMillis?.let {
+            holder.itemView.time.text = DateFormat.getLongDateFormat(holder.itemView.context).format(Date(it)) + " " + DateFormat.getTimeFormat(holder.itemView.context).format(Date(it))
+        }
     }
 
     inner class VH(view: View) : RecyclerView.ViewHolder(view)

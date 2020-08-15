@@ -3,6 +3,7 @@ package com.balance.update.autobalanceupdate.sms
 import android.app.IntentService
 import android.content.Intent
 import android.provider.Telephony
+import android.text.format.DateFormat
 import android.widget.Toast
 import com.balance.update.autobalanceupdate.App
 import com.balance.update.autobalanceupdate.GoogleServiceAuth
@@ -18,7 +19,7 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.client.util.ExponentialBackOff
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse
 import io.reactivex.schedulers.Schedulers
-import java.lang.Exception
+import java.util.*
 
 class SmsParserService : IntentService("SmsService") {
 
@@ -45,15 +46,16 @@ class SmsParserService : IntentService("SmsService") {
     override fun onHandleIntent(intent: Intent) {
         Telephony.Sms.Intents.getMessagesFromIntent(intent).forEach {
             try {
-                handleMessage(it.originatingAddress, it.messageBody)
+                handleMessage(it.originatingAddress, it.messageBody, it.timestampMillis)
             } catch (ex: Throwable) {
                 Toast.makeText(this, "Some excepion: ${ex.localizedMessage}", Toast.LENGTH_LONG).show()
             }
         }
     }
 
-    private fun handleMessage(sender: String, messageBody: String) {
-        toastUI(this, "message: $messageBody")
+    private fun handleMessage(sender: String, messageBody: String, timeMillis: Long) {
+        val date = DateFormat.getDateFormat(this).format(Date(timeMillis))
+        toastUI(this, "message: $messageBody, date: $date")
 
         val googleAccountCredential = GoogleAccountCredential
                 .usingOAuth2(this, GoogleServiceAuth.SCOPES)
@@ -83,14 +85,14 @@ class SmsParserService : IntentService("SmsService") {
         result.updatedRows = -999
 
         when (smsData) {
-            is SmsData.SmsSpent -> resolveSmsSpent(result, smsData, sheetsApi)
-            is SmsData.SmsExchange -> resolveSmsExchange(smsData, sheetsApi)
-            is SmsData.SmsGetCash -> resolveSmsGetCash(smsData, sheetsApi)
+            is SmsData.SmsSpent -> resolveSmsSpent(result, smsData, sheetsApi, timeMillis)
+            is SmsData.SmsExchange -> resolveSmsExchange(smsData, sheetsApi, timeMillis)
+            is SmsData.SmsGetCash -> resolveSmsGetCash(smsData, sheetsApi, timeMillis)
         }
 
     }
 
-    private fun resolveSmsGetCash(smsData: SmsData.SmsGetCash, sheetsApi: SheetsApi) {
+    private fun resolveSmsGetCash(smsData: SmsData.SmsGetCash, sheetsApi: SheetsApi, timeMillis: Long) {
         toastUI(this, "Снятие наличных BYN ${smsData.cashBYN}")
 
         when (smsData.sender) {
@@ -103,7 +105,8 @@ class SmsParserService : IntentService("SmsService") {
                 App.db.logDao()
                         .insert(LogEntity(sender = smsData.sender.name, seller = "Банкомат",
                                 actualBalance = smsData.actualBalance, spent = 0.0,
-                                categoryBalance = 0.0, sellerText = "Снятие наличных BYN ${smsData.cashBYN}"))
+                                categoryBalance = 0.0, sellerText = "Снятие наличных BYN ${smsData.cashBYN}",
+                                timeInMillis = timeMillis))
                         .subscribeOn(Schedulers.io())
                         .subscribe()
             }
@@ -114,7 +117,7 @@ class SmsParserService : IntentService("SmsService") {
         }
     }
 
-    private fun resolveSmsSpent(result: UpdateValuesResponse, smsSpent: SmsData.SmsSpent, sheetsApi: SheetsApi) {
+    private fun resolveSmsSpent(result: UpdateValuesResponse, smsSpent: SmsData.SmsSpent, sheetsApi: SheetsApi, timeMillis: Long) {
         var result1 = result
         result1 = when (smsSpent.sender) {
             is SmsSender.Mtbank -> sheetsApi.updateCell(HALVA_BALANCE_CELL, smsSpent.actualBalance)
@@ -179,12 +182,13 @@ class SmsParserService : IntentService("SmsService") {
         App.db.logDao()
                 .insert(LogEntity(sender = smsSpent.sender.name, seller = smsSpent.seller.name,
                         actualBalance = smsSpent.actualBalance, spent = smsSpent.spent,
-                        categoryBalance = balanceCell, sellerText = "Spent"))
+                        categoryBalance = balanceCell, sellerText = "Spent",
+                        timeInMillis = timeMillis))
                 .subscribeOn(Schedulers.io())
                 .subscribe()
     }
 
-    private fun resolveSmsExchange(smsExchange: SmsData.SmsExchange, sheetsApi: SheetsApi) {
+    private fun resolveSmsExchange(smsExchange: SmsData.SmsExchange, sheetsApi: SheetsApi, timeMillis: Long) {
         toastUI(this, "Perevod USD $ ${smsExchange.exchangedUSD}")
 
         when (smsExchange.sender) {
@@ -201,7 +205,8 @@ class SmsParserService : IntentService("SmsService") {
                 App.db.logDao()
                         .insert(LogEntity(sender = smsExchange.sender.name, seller = "Перевод",
                                 actualBalance = smsExchange.actualBalance, spent = 0.0,
-                                categoryBalance = 0.0, sellerText = "Perevod USD $ ${smsExchange.exchangedUSD}"))
+                                categoryBalance = 0.0, sellerText = "Perevod USD $ ${smsExchange.exchangedUSD}",
+                                timeInMillis = timeMillis))
                         .subscribeOn(Schedulers.io())
                         .subscribe()
             }

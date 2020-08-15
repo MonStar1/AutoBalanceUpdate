@@ -21,7 +21,7 @@ sealed class Seller(val name: String, val shopsArray: Array<String>) {
             "BREST"))
 
     object Health : Seller("Health", arrayOf("APTEKA", "SYNEVO"))
-    object Sweet : Seller("Sweet", arrayOf("KRASNYY PISCHEVIK", "KIOSK"))
+    object Sweet : Seller("Sweet", arrayOf("KRASNYY", "KIOSK"))
     object Transport : Seller("Transport", arrayOf("AZS", "Taxi"))
     object Cafe : Seller("Cafe", arrayOf("GOGOPIZZA",
             "KFC",
