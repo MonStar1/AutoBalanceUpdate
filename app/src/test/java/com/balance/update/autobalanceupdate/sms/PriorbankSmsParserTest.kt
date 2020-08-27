@@ -3,6 +3,7 @@ package com.balance.update.autobalanceupdate.sms
 import com.balance.update.autobalanceupdate.sms.parser.PriorbankSmsParser
 import com.balance.update.autobalanceupdate.sms.parser.SmsData
 import com.balance.update.autobalanceupdate.sms.parser.SmsParseException
+import com.balance.update.autobalanceupdate.sms.seller.Seller
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -75,5 +76,18 @@ class PriorbankSmsParserTest {
         parser = PriorbankSmsParser("Other text")
 
         val result = parser.parse()
+    }
+
+
+    @Test
+    fun parse_spent() {
+        val body = "Priorbank. Karta 4***7405 21-08-2020 19:42:50. Oplata 140.94 BYN. BLR WWW.HIT.E-DOSTAVKA.BY. Dostupno: 233.77 BYN. Spravka: 80172899292"
+        parser = PriorbankSmsParser(body)
+
+        val result = parser.parse() as SmsData.SmsSpent
+
+        assertEquals(233.77, result.actualBalance, 0.0)
+        assertEquals(140.94, result.spent, 0.0)
+        assertEquals(Seller.Food, result.seller)
     }
 }

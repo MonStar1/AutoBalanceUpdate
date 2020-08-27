@@ -4,11 +4,13 @@ import com.balance.update.autobalanceupdate.sms.seller.Seller
 import org.junit.Assert.*
 import org.junit.Test
 
-class MtbankSellerParserTest {
+class SellerParserTest {
+
+    private val sellerParser = SellerParser("OPLATA", "BYN");
 
     @Test
     fun testUnknown() {
-        val seller = MtbankSellerParser.getSeller("WTF BYN")
+        val seller = sellerParser.getSeller("WTF BYN")
 
         assertTrue(seller.first is Seller.Unknown)
     }
@@ -22,7 +24,7 @@ PT CT "KORONA", , MINSK
 OSTATOK 123.39 BYN
 Spr.:5099999"""
 
-        val seller = MtbankSellerParser.getSeller(body)
+        val seller = sellerParser.getSeller(body)
 
         assertTrue(seller.first is Seller.Food)
     }
@@ -36,7 +38,7 @@ PT SHOP APTEKA N1 GRODNO BY
 OSTATOK 2.03BYN
 Spr.:5099999"""
 
-        val seller = MtbankSellerParser.getSeller(body)
+        val seller = sellerParser.getSeller(body)
 
         assertTrue(seller.first is Seller.Health)
     }
@@ -50,7 +52,7 @@ SUP AZS N1 GRODNO BY
 OSTATOK 2.03BYN
 Spr.:5099999"""
 
-        val seller = MtbankSellerParser.getSeller(body)
+        val seller = sellerParser.getSeller(body)
 
         assertTrue(seller.first is Seller.Transport)
     }
@@ -64,7 +66,7 @@ SHOP"WWW.GOGOPIZZA.BY" / GRODNO / BY
 OSTATOK 225.78 BYN
 Spr.:5099999"""
 
-        val seller = MtbankSellerParser.getSeller(body)
+        val seller = sellerParser.getSeller(body)
 
         assertTrue(seller.first is Seller.Cafe)
     }

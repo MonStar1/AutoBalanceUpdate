@@ -5,13 +5,31 @@ import com.balance.update.autobalanceupdate.sms.seller.Seller
 
 class PriorbankSmsParser(private val body: String) : SmsParser {
 
+    private val parser = SellerParser("Oplata", "BYN\\S")
+
     override fun parse(): SmsData {
-        return if (getPerevod() != 0.0) {
-            SmsData.SmsExchange(SmsSender.PriorBank(), getPerevod(), getActualBalance())
-        } else if (getCash() != 0.0) {
-            SmsData.SmsGetCash(SmsSender.PriorBank(), getCash(), getActualBalance())
+        return when {
+            getPerevod() != 0.0 -> {
+                SmsData.SmsExchange(SmsSender.PriorBank(), getPerevod(), getActualBalance())
+            }
+            getCash() != 0.0 -> {
+                SmsData.SmsGetCash(SmsSender.PriorBank(), getCash(), getActualBalance())
+            }
+            else -> {
+                val seller = parser.getSeller(body)
+                val spent = getSpent()
+                SmsData.SmsSpent(SmsSender.PriorBank(), seller.first, spent, getActualBalance())
+            }
+        }
+    }
+
+    private fun getSpent(): Double {
+        val matcher = buildPattern("Oplata", "BYN").matcher(body)
+
+        return if (matcher.matches()) {
+            matcher.group(1).toDouble()
         } else {
-            SmsData.SmsSpent(SmsSender.PriorBank(), Seller.Unknown, 0.0, getActualBalance())
+            0.0
         }
     }
 
@@ -28,20 +46,20 @@ class PriorbankSmsParser(private val body: String) : SmsParser {
     private fun getPerevod(): Double {
         val matcher = buildPattern("Zachislenie perevoda", "USD").matcher(body)
 
-        if (matcher.matches()) {
-            return matcher.group(1).toDouble()
+        return if (matcher.matches()) {
+            matcher.group(1).toDouble()
         } else {
-            return 0.0
+            0.0
         }
     }
 
     private fun getCash(): Double {
         val matcher = buildPattern("Nalichnye v bankomate", "BYN").matcher(body)
 
-        if (matcher.matches()) {
-            return matcher.group(1).toDouble()
+        return if (matcher.matches()) {
+            matcher.group(1).toDouble()
         } else {
-            return 0.0
+            0.0
         }
     }
 }

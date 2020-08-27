@@ -157,7 +157,9 @@ private class LogAdapter(var data: List<LogEntity>) : RecyclerView.Adapter<LogAd
         item.timeInMillis?.let {
             holder.itemView.time.text = DateFormat.getLongDateFormat(holder.itemView.context).format(Date(it)) + " " + DateFormat.getTimeFormat(holder.itemView.context).format(Date(it))
         }
+
+        holder.itemView.setBackgroundResource(if (item.isSellerResolved) R.color.green_alpha else R.color.gray)
     }
 
-    inner class VH(view: View) : RecyclerView.ViewHolder(view)
+    private class VH(view: View) : RecyclerView.ViewHolder(view)
 }

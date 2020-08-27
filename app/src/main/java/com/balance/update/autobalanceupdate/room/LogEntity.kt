@@ -2,7 +2,6 @@ package com.balance.update.autobalanceupdate.room
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import javax.annotation.Nullable
 
 @Entity
 data class LogEntity(
@@ -13,5 +12,6 @@ data class LogEntity(
         val actualBalance: Double,
         val categoryBalance: Double,
         val sellerText: String,
-        val timeInMillis: Long?
+        val timeInMillis: Long?,
+        val isSellerResolved: Boolean
 )

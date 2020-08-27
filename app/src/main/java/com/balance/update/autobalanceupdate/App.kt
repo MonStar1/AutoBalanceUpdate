@@ -24,6 +24,12 @@ class App : Application() {
                     }
 
                 })
+                .addMigrations(object : Migration(3, 4) {
+                    override fun migrate(database: SupportSQLiteDatabase) {
+                        database.execSQL("ALTER TABLE LogEntity ADD COLUMN isSellerResolved INTEGER DEFAULT 0 NOT NULL")
+                    }
+
+                })
                 .fallbackToDestructiveMigration().build()
     }
 }

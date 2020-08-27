@@ -1,6 +1,5 @@
 package com.balance.update.autobalanceupdate.sms
 
-import com.balance.update.autobalanceupdate.sms.parser.MtbankSellerParser
 import com.balance.update.autobalanceupdate.sms.parser.MtbankSmsParser
 import com.balance.update.autobalanceupdate.sms.parser.SmsData
 import com.balance.update.autobalanceupdate.sms.parser.SmsParseException
@@ -72,13 +71,30 @@ class MtbankSmsParserTest {
         parser = MtbankSmsParser("""KARTA:5351*1635
     16/08/18 12:46
     OPLATA 6.90 BYN
-    GLAVPIT, , MINSK
+    WWW.HIT.E-DOSTAVKA.BY, , MINSK
     OSTATOK 62.37 BYN
     Spr.:5099999""")
 
         val result = parser.parse() as SmsData.SmsSpent
 
         assertEquals(62.37, result.actualBalance, 6.90)
+        assertEquals(Seller.Food, result.seller)
+    }
+
+    @Test
+    fun parse_8() {
+        parser = MtbankSmsParser("""KARTA:5351*1635
+    16/08/18 12:46
+    OPLATA 6.90 BYN
+    fukdostavka, , MINSK
+    OSTATOK 62.37 BYN
+    Spr.:5099999""")
+
+        val result = parser.parse() as SmsData.SmsSpent
+
+        assertEquals(62.37, result.actualBalance, 6.90)
+        assertEquals("""
+    fukdostavka, , MINSK""", (result.seller as Seller.Unknown).seller)
     }
 
 }
