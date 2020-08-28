@@ -1,7 +1,7 @@
 package com.balance.update.autobalanceupdate.sms.seller
 
 sealed class Seller(val name: String, val shopsArray: Array<String>) {
-    class Unknown(val seller: String) : Seller("Unknown", emptyArray())
+    class Unknown(val seller: String) : Seller(seller, emptyArray())
     object Food : Seller("Food", arrayOf(
             "SOSEDI",
             "KORONA",

@@ -180,7 +180,7 @@ class SmsParserService : IntentService("SmsService") {
             }
             is Seller.Unknown -> {
                 val balance = sheetsApi.readCell(UNKNOWN_SELLER).toDouble()
-                balanceCell = balance + smsSpent.spent
+                balanceCell = balance - smsSpent.spent
 
                 sheetsApi.updateCell(UNKNOWN_SELLER, balanceCell)
             }
