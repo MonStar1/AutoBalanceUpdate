@@ -46,7 +46,7 @@ class SheetsApi(credential: GoogleAccountCredential) {
     fun readCell(targetCell: String): String {
         val valueRange = service.get(spreadsheetId, "$sheetName!$targetCell").execute()
 
-        val toString = valueRange.getValues().get(0).get(0).toString()
+        val toString = valueRange?.getValues()?.get(0)?.get(0)?.toString() ?: "0"
 
         return toString.replace(",", ".")
     }
