@@ -7,13 +7,17 @@ import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.balance.update.autobalanceupdate.extension.logd
 import com.balance.update.autobalanceupdate.extension.toast
 import com.balance.update.autobalanceupdate.room.LogEntity
+import com.balance.update.autobalanceupdate.sms.SmsResolver
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -37,6 +41,7 @@ import kotlinx.coroutines.launch
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 import java.util.Date
+import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, EasyPermissions.RationaleCallbacks {
 
@@ -87,7 +92,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                recyclerView.adapter = LogAdapter(it)
+                recyclerView.adapter = LogAdapter(it, supportFragmentManager, application as App)
             }
             .apply { composDisposable.addAll(this) }
     }
@@ -147,7 +152,8 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
     }
 }
 
-private class LogAdapter(var data: List<LogEntity>) : RecyclerView.Adapter<LogAdapter.VH>() {
+class LogAdapter(var data: List<LogEntity>, val fragmentManager: FragmentManager, val app: App) :
+    RecyclerView.Adapter<LogAdapter.VH>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH =
         VH(LayoutInflater.from(parent.context).inflate(R.layout.log_item, parent, false))
@@ -156,6 +162,25 @@ private class LogAdapter(var data: List<LogEntity>) : RecyclerView.Adapter<LogAd
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val item = data[position]
+
+        holder.itemView.setOnLongClickListener {
+            if (item.isSellerResolved) {
+                false
+            } else {
+                BottomSheet {
+                    item.seller = it.name
+                    item.isSellerResolved = true
+
+                    Completable.fromAction { SmsResolver(app).resolveSeller(item.spent, it) }
+                        .andThen { obs -> App.db.logDao().update(item).subscribe(obs) }
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe {}
+
+                }.show(fragmentManager, "")
+                true
+            }
+        }
 
         holder.itemView.seller.text = item.seller
         holder.itemView.sender.text = item.sender
@@ -171,5 +196,5 @@ private class LogAdapter(var data: List<LogEntity>) : RecyclerView.Adapter<LogAd
         holder.itemView.setBackgroundResource(if (item.isSellerResolved) R.color.green_alpha else R.color.gray)
     }
 
-    private class VH(view: View) : RecyclerView.ViewHolder(view)
+    class VH(view: View) : RecyclerView.ViewHolder(view)
 }

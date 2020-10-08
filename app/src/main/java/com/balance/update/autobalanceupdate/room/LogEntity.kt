@@ -7,11 +7,11 @@ import androidx.room.PrimaryKey
 data class LogEntity(
         @PrimaryKey(autoGenerate = true) val id: Int = 0,
         val sender: String,
-        val seller: String,
+        var seller: String,
         val spent: Double,
         val actualBalance: Double,
         val categoryBalance: Double,
         val sellerText: String,
         val timeInMillis: Long?,
-        val isSellerResolved: Boolean
+        var isSellerResolved: Boolean
 )

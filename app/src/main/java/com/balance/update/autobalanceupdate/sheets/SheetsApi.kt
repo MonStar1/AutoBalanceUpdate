@@ -33,12 +33,12 @@ class SheetsApi(credential: GoogleAccountCredential) {
         return this
     }
 
-    fun updateCell(targetCell: String, targetValue: Any): UpdateValuesResponse {
+    fun updateCell(targetCell: String, targetValue: Any) {
         val values = listOf(listOf(targetValue))
 
         val body = ValueRange().setValues(values)
 
-        return service.update(spreadsheetId, "$sheetName!$targetCell", body)
+        service.update(spreadsheetId, "$sheetName!$targetCell", body)
                 .setValueInputOption("RAW")
                 .execute()
     }
