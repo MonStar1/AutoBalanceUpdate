@@ -2,7 +2,8 @@ package com.balance.update.autobalanceupdate.sms.seller
 
 sealed class Seller(val name: String, val shopsArray: Array<String>) {
     class Unknown(val seller: String) : Seller(seller, emptyArray())
-    object Food : Seller("Food", arrayOf(
+    object Food : Seller(
+        "Food", arrayOf(
             "SOSEDI",
             "KORONA",
             "EVROOPT",
@@ -14,30 +15,67 @@ sealed class Seller(val name: String, val shopsArray: Array<String>) {
             "INDURSK",
             "SOLNESHNY",
             "GREEN",
+            "GRODNENSKIY TC",
             "SANTA",
             "SUVOROVSKIY",
             "SPADAR",
             "E-DOSTA",
-            "BREST"))
+            "BREST"
+        )
+    )
 
-    object Health : Seller("Health", arrayOf("APTEKA", "SYNEVO"))
-    object Sweet : Seller("Sweet", arrayOf("KRASNYY", "KIOSK"))
-    object Transport : Seller("Transport", arrayOf("AZS", "Taxi"))
-    object Cafe : Seller("Cafe", arrayOf("GOGOPIZZA",
+    object Health : Seller(
+        "Health", arrayOf(
+            "APTEKA",
+            "SYNEVO"
+        )
+    )
+
+    object Sweet : Seller(
+        "Sweet", arrayOf(
+            "KRASNYY",
+            "KIOSK"
+        )
+    )
+
+    object Transport : Seller(
+        "Transport", arrayOf(
+            "AZS",
+            "Taxi"
+        )
+    )
+
+    object Cafe : Seller(
+        "Cafe", arrayOf(
+            "GOGOPIZZA",
             "KFC",
+            "KAFE",
             "TRDLO",
             "GOU-GOU",
-            "DODO", "PIZZA", "BARASHKA", "GO CAFE", "PROSTO KOFE", "MENU.BY"))
+            "DODO", "PIZZA",
+            "BARASHKA",
+            "GO CAFE",
+            "PROSTO KOFE",
+            "MENU.BY"
+        )
+    )
 
     object Household : Seller("Household", arrayOf("MILA"))
-    object Clothes : Seller("Clothes", arrayOf(
+    object Music : Seller("Music", arrayOf("MUSIC"))
+    object Clothes : Seller(
+        "Clothes", arrayOf(
             "COLINS",
             "GLORIA",
             "BELWEST"
-    ))
+        )
+    )
 
-    object Child : Seller("Child", arrayOf(
+    object Child : Seller(
+        "Child", arrayOf(
             "BUSLIK",
+            "BEBIMARK",
+            "PESOCHNICA",
             "PODGUZNIK"
-    ))
+        )
+    )
 }

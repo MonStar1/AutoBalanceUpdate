@@ -17,12 +17,26 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.android.synthetic.main.log_item.view.*
-import pub.devrel.easypermissions.EasyPermissions
+import kotlinx.android.synthetic.main.content_main.mtbank
+import kotlinx.android.synthetic.main.content_main.openBattery
+import kotlinx.android.synthetic.main.content_main.prior
+import kotlinx.android.synthetic.main.content_main.recyclerView
+import kotlinx.android.synthetic.main.content_main.textView
+import kotlinx.android.synthetic.main.log_item.view.balance
+import kotlinx.android.synthetic.main.log_item.view.balanceCategory
+import kotlinx.android.synthetic.main.log_item.view.seller
+import kotlinx.android.synthetic.main.log_item.view.sellerText
+import kotlinx.android.synthetic.main.log_item.view.sender
+import kotlinx.android.synthetic.main.log_item.view.spent
+import kotlinx.android.synthetic.main.log_item.view.time
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import pub.devrel.easypermissions.AppSettingsDialog
-import java.util.*
-
+import pub.devrel.easypermissions.EasyPermissions
+import java.util.Date
 
 class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, EasyPermissions.RationaleCallbacks {
 
@@ -30,6 +44,7 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
     private val composDisposable = CompositeDisposable()
 
     companion object {
+
         const val SMS_PERMISSION = Manifest.permission.RECEIVE_SMS
         const val RC_RECEIVE_SMS = 111
     }
@@ -60,38 +75,32 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
             requestSmsPermission()
         }
 
-//        thread {
-//            val cursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null)
-//
-//            if (cursor!!.moveToFirst()) { // must check the result to prevent exception
-//                do {
-//                    var msgData = ""
-//                    for (idx in 0 until cursor.columnCount) {
-//                        msgData += " " + cursor.getColumnName(idx) + ":" + cursor.getString(idx)
-//                    }
-//                    // use msgData
-//                } while (cursor.moveToNext())
-//            } else {
-//                // empty box, no SMS
-//            }
-//        }
-
+        val app = (application as App)
+        app.datastore.data.onEach {
+            GlobalScope.launch(Dispatchers.Main) {
+                prior.text = "Приор ${it[app.priorBalance]}"
+                mtbank.text = "Мтбанк ${it[app.mtbankBalance]}"
+            }
+        }.launchIn(GlobalScope)
 
         App.db.logDao().getAll()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    recyclerView.adapter = LogAdapter(it)
-                }
-                .apply { composDisposable.addAll(this) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                recyclerView.adapter = LogAdapter(it)
+            }
+            .apply { composDisposable.addAll(this) }
     }
-
 
     private fun requestSmsPermission() {
         EasyPermissions.requestPermissions(this, "Rationale", RC_RECEIVE_SMS, Manifest.permission.RECEIVE_SMS)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
@@ -121,7 +130,6 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
         requestSmsPermission()
     }
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -137,11 +145,12 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
 
         composDisposable.clear()
     }
-
 }
 
 private class LogAdapter(var data: List<LogEntity>) : RecyclerView.Adapter<LogAdapter.VH>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH = VH(LayoutInflater.from(parent.context).inflate(R.layout.log_item, parent, false))
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH =
+        VH(LayoutInflater.from(parent.context).inflate(R.layout.log_item, parent, false))
 
     override fun getItemCount() = data.size
 
@@ -155,7 +164,8 @@ private class LogAdapter(var data: List<LogEntity>) : RecyclerView.Adapter<LogAd
         holder.itemView.balanceCategory.text = item.categoryBalance.toString()
         holder.itemView.sellerText.text = item.sellerText
         item.timeInMillis?.let {
-            holder.itemView.time.text = DateFormat.getLongDateFormat(holder.itemView.context).format(Date(it)) + " " + DateFormat.getTimeFormat(holder.itemView.context).format(Date(it))
+            holder.itemView.time.text = DateFormat.getLongDateFormat(holder.itemView.context)
+                .format(Date(it)) + " " + DateFormat.getTimeFormat(holder.itemView.context).format(Date(it))
         }
 
         holder.itemView.setBackgroundResource(if (item.isSellerResolved) R.color.green_alpha else R.color.gray)

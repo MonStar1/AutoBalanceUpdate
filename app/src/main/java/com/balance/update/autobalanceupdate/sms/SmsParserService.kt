@@ -5,11 +5,15 @@ import android.content.Intent
 import android.provider.Telephony
 import android.text.format.DateFormat
 import android.widget.Toast
+import androidx.datastore.preferences.createDataStore
+import androidx.datastore.preferences.edit
+import androidx.datastore.preferences.preferencesKey
 import com.balance.update.autobalanceupdate.App
 import com.balance.update.autobalanceupdate.GoogleServiceAuth
 import com.balance.update.autobalanceupdate.extension.toastUI
 import com.balance.update.autobalanceupdate.room.LogEntity
 import com.balance.update.autobalanceupdate.sheets.SheetsApi
+import com.balance.update.autobalanceupdate.sms.SmsSender.PriorBank
 import com.balance.update.autobalanceupdate.sms.parser.SmsData
 import com.balance.update.autobalanceupdate.sms.parser.SmsParseException
 import com.balance.update.autobalanceupdate.sms.parser.SmsSenderException
@@ -19,11 +23,14 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.client.util.ExponentialBackOff
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import java.util.*
 
 class SmsParserService : IntentService("SmsService") {
 
     companion object {
+
         const val HALVA_BALANCE_CELL = "C6"
         const val PRIOR_BALANCE_CELL = "C5"
         const val FOOD_CELL = "C9"
@@ -34,6 +41,7 @@ class SmsParserService : IntentService("SmsService") {
         const val HOUSEHOLD_CELL = "C17"
         const val CLOTHES_CELL = "C18"
         const val CHILD_CELL = "C19"
+        const val MUSIC_CELL = "C21"
         const val CHANGED_USD_CELL = "C3"
         const val TO_SPEND_USD_CELL = "C4"
         const val CASH_CELL = "C7"
@@ -42,7 +50,6 @@ class SmsParserService : IntentService("SmsService") {
         const val BALANCE_SPREADSHEET = "15NfMZvT2qDM8Xja1GnqumkNd8sIEgDM2XbMNaWkJocQ"
         const val BALANCE_SHEET = "Sheet_1"
     }
-
 
     override fun onHandleIntent(intent: Intent) {
         Telephony.Sms.Intents.getMessagesFromIntent(intent).forEach {
@@ -59,8 +66,8 @@ class SmsParserService : IntentService("SmsService") {
         toastUI(this, "message: $messageBody, date: $date")
 
         val googleAccountCredential = GoogleAccountCredential
-                .usingOAuth2(this, GoogleServiceAuth.SCOPES)
-                .setBackOff(ExponentialBackOff())
+            .usingOAuth2(this, GoogleServiceAuth.SCOPES)
+            .setBackOff(ExponentialBackOff())
 
         googleAccountCredential?.selectedAccount = GoogleSignIn.getLastSignedInAccount(this)?.account
 
@@ -86,7 +93,6 @@ class SmsParserService : IntentService("SmsService") {
             is SmsData.SmsExchange -> resolveSmsExchange(smsData, sheetsApi, timeMillis)
             is SmsData.SmsGetCash -> resolveSmsGetCash(smsData, sheetsApi, timeMillis)
         }
-
     }
 
     private fun resolveSmsGetCash(smsData: SmsData.SmsGetCash, sheetsApi: SheetsApi, timeMillis: Long) {
@@ -99,13 +105,28 @@ class SmsParserService : IntentService("SmsService") {
                 sheetsApi.updateCell(PRIOR_BALANCE_CELL, smsData.actualBalance)
                 sheetsApi.updateCell(CASH_CELL, cashBYN + smsData.cashBYN)
 
+                runBlocking {
+                    val app = (application as App)
+                    app.datastore.edit {
+                        if (smsData.sender is PriorBank) {
+                            it[app.priorBalance] = smsData.actualBalance.toLong()
+                        } else {
+                            it[app.mtbankBalance] = smsData.actualBalance.toLong()
+                        }
+                    }
+                }
+
                 App.db.logDao()
-                        .insert(LogEntity(sender = smsData.sender.name, seller = "Банкомат",
-                                actualBalance = smsData.actualBalance, spent = 0.0,
-                                categoryBalance = 0.0, sellerText = "Снятие наличных BYN ${smsData.cashBYN}",
-                                timeInMillis = timeMillis, isSellerResolved = true))
-                        .subscribeOn(Schedulers.io())
-                        .subscribe()
+                    .insert(
+                        LogEntity(
+                            sender = smsData.sender.name, seller = "Банкомат",
+                            actualBalance = smsData.actualBalance, spent = 0.0,
+                            categoryBalance = 0.0, sellerText = "Снятие наличных BYN ${smsData.cashBYN}",
+                            timeInMillis = timeMillis, isSellerResolved = true
+                        )
+                    )
+                    .subscribeOn(Schedulers.io())
+                    .subscribe()
             }
             is SmsSender.Mtbank -> {
             }
@@ -171,6 +192,12 @@ class SmsParserService : IntentService("SmsService") {
 
                 sheetsApi.updateCell(CHILD_CELL, balanceCell)
             }
+            is Seller.Music -> {
+                val balance = sheetsApi.readCell(MUSIC_CELL).toDouble()
+                balanceCell = balance - smsSpent.spent
+
+                sheetsApi.updateCell(MUSIC_CELL, balanceCell)
+            }
             is Seller.Unknown -> {
                 val balance = sheetsApi.readCell(UNKNOWN_SELLER).toDouble()
                 balanceCell = balance - smsSpent.spent
@@ -181,13 +208,28 @@ class SmsParserService : IntentService("SmsService") {
 
         val sellerName = if (smsSpent.seller is Seller.Unknown) smsSpent.seller.seller else smsSpent.seller.name
 
+        runBlocking {
+            val app = (application as App)
+            app.datastore.edit {
+                if (smsSpent.sender is PriorBank) {
+                    it[app.priorBalance] = smsSpent.actualBalance.toLong()
+                } else {
+                    it[app.mtbankBalance] = smsSpent.actualBalance.toLong()
+                }
+            }
+        }
+
         App.db.logDao()
-                .insert(LogEntity(sender = smsSpent.sender.name, seller = sellerName,
-                        actualBalance = smsSpent.actualBalance, spent = smsSpent.spent,
-                        categoryBalance = balanceCell, sellerText = "Потрачено",
-                        timeInMillis = timeMillis, isSellerResolved = smsSpent.seller !is Seller.Unknown))
-                .subscribeOn(Schedulers.io())
-                .subscribe()
+            .insert(
+                LogEntity(
+                    sender = smsSpent.sender.name, seller = sellerName,
+                    actualBalance = smsSpent.actualBalance, spent = smsSpent.spent,
+                    categoryBalance = balanceCell, sellerText = "Потрачено",
+                    timeInMillis = timeMillis, isSellerResolved = smsSpent.seller !is Seller.Unknown
+                )
+            )
+            .subscribeOn(Schedulers.io())
+            .subscribe()
     }
 
     private fun resolveSmsExchange(smsExchange: SmsData.SmsExchange, sheetsApi: SheetsApi, timeMillis: Long) {
@@ -204,20 +246,33 @@ class SmsParserService : IntentService("SmsService") {
                 sheetsApi.updateCell(TO_SPEND_USD_CELL, toSpendUsd - smsExchange.exchangedUSD)
                 sheetsApi.updateCell(ON_THE_CARD_USD_CELL, onCardUsd - smsExchange.exchangedUSD)
 
+                runBlocking {
+                    val app = (application as App)
+                    app.datastore.edit {
+                        if (smsExchange.sender is PriorBank) {
+                            it[app.priorBalance] = smsExchange.actualBalance.toLong()
+                        } else {
+                            it[app.mtbankBalance] = smsExchange.actualBalance.toLong()
+                        }
+                    }
+                }
+
                 App.db.logDao()
-                        .insert(LogEntity(sender = smsExchange.sender.name, seller = "Перевод",
-                                actualBalance = smsExchange.actualBalance, spent = 0.0,
-                                categoryBalance = 0.0, sellerText = "Перевод USD $ ${smsExchange.exchangedUSD}",
-                                timeInMillis = timeMillis, isSellerResolved = true))
-                        .subscribeOn(Schedulers.io())
-                        .subscribe()
+                    .insert(
+                        LogEntity(
+                            sender = smsExchange.sender.name, seller = "Перевод",
+                            actualBalance = smsExchange.actualBalance, spent = 0.0,
+                            categoryBalance = 0.0, sellerText = "Перевод USD $ ${smsExchange.exchangedUSD}",
+                            timeInMillis = timeMillis, isSellerResolved = true
+                        )
+                    )
+                    .subscribeOn(Schedulers.io())
+                    .subscribe()
             }
             is SmsSender.Mtbank -> {
             }
             is SmsSender.Test -> {
             }
         }
-
     }
-
 }

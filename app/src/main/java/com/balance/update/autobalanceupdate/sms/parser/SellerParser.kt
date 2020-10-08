@@ -12,6 +12,7 @@ class SellerParser(private val patternPrefix: String, private val patterPostfix:
         val sweet = buildCommonPatternPay(Seller.Sweet.shopsArray).matcher(body)
         val cafe = buildCommonPatternPay(Seller.Cafe.shopsArray).matcher(body)
         val household = buildCommonPatternPay(Seller.Household.shopsArray).matcher(body)
+        val music = buildCommonPatternPay(Seller.Music.shopsArray).matcher(body)
         val clothes = buildCommonPatternPay(Seller.Clothes.shopsArray).matcher(body)
         val child = buildCommonPatternPay(Seller.Child.shopsArray).matcher(body)
 
@@ -24,6 +25,7 @@ class SellerParser(private val patternPrefix: String, private val patterPostfix:
             household.find() -> Pair(Seller.Household, household.group(2))
             clothes.find() -> Pair(Seller.Clothes, clothes.group(2))
             child.find() -> Pair(Seller.Child, child.group(2))
+            music.find() -> Pair(Seller.Music, music.group(2))
             else -> Pair(Seller.Unknown("Unknown"), "Unknown")
         }
     }
