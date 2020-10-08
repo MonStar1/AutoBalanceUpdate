@@ -81,12 +81,8 @@ class SmsParserService : IntentService("SmsService") {
             selectSheet(BALANCE_SHEET)
         }
 
-        var result = UpdateValuesResponse()
-
-        result.updatedRows = -999
-
         when (smsData) {
-            is SmsData.SmsSpent -> resolveSmsSpent(result, smsData, sheetsApi, timeMillis)
+            is SmsData.SmsSpent -> resolveSmsSpent(smsData, sheetsApi, timeMillis)
             is SmsData.SmsExchange -> resolveSmsExchange(smsData, sheetsApi, timeMillis)
             is SmsData.SmsGetCash -> resolveSmsGetCash(smsData, sheetsApi, timeMillis)
         }
@@ -118,15 +114,12 @@ class SmsParserService : IntentService("SmsService") {
         }
     }
 
-    private fun resolveSmsSpent(result: UpdateValuesResponse, smsSpent: SmsData.SmsSpent, sheetsApi: SheetsApi, timeMillis: Long) {
-        var result1 = result
-        result1 = when (smsSpent.sender) {
+    private fun resolveSmsSpent(smsSpent: SmsData.SmsSpent, sheetsApi: SheetsApi, timeMillis: Long) {
+        when (smsSpent.sender) {
             is SmsSender.Mtbank -> sheetsApi.updateCell(HALVA_BALANCE_CELL, smsSpent.actualBalance)
             is SmsSender.PriorBank -> sheetsApi.updateCell(PRIOR_BALANCE_CELL, smsSpent.actualBalance)
-            is SmsSender.Test -> result1
+            is SmsSender.Test -> Unit
         }
-
-        toastUI(this, "updated: ${result1.updatedRows}")
 
         var balanceCell = 0.0
         when (smsSpent.seller) {

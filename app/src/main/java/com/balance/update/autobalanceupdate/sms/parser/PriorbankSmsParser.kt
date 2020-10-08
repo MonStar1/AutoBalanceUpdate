@@ -2,6 +2,7 @@ package com.balance.update.autobalanceupdate.sms.parser
 
 import com.balance.update.autobalanceupdate.sms.SmsSender
 import com.balance.update.autobalanceupdate.sms.seller.Seller
+import java.util.regex.Pattern
 
 class PriorbankSmsParser(private val body: String) : SmsParser {
 
@@ -16,9 +17,16 @@ class PriorbankSmsParser(private val body: String) : SmsParser {
                 SmsData.SmsGetCash(SmsSender.PriorBank(), getCash(), getActualBalance())
             }
             else -> {
-                val seller = parser.getSeller(body)
+                var seller = parser.getSeller(body).first
+                if (seller is Seller.Unknown) {
+                    val flags = Pattern.CASE_INSENSITIVE or Pattern.DOTALL
+                    val matcher = Pattern.compile(".*BYN\\s*?(.+?)\\s*?Dostupno.*", flags).matcher(body)
+                    if (matcher.matches()) {
+                        seller = Seller.Unknown(matcher.group(1))
+                    }
+                }
                 val spent = getSpent()
-                SmsData.SmsSpent(SmsSender.PriorBank(), seller.first, spent, getActualBalance())
+                SmsData.SmsSpent(SmsSender.PriorBank(), seller, spent, getActualBalance())
             }
         }
     }

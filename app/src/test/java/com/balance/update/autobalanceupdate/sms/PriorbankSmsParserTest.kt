@@ -50,7 +50,8 @@ class PriorbankSmsParserTest {
 
     @Test
     fun parse_USD_change() {
-        val body = "Priorbank. Karta 4***7405 26-01-2020 12:49:35. Zachislenie perevoda 100.00 USD. BLR ANDREI PAPKO. Dostupno: 292.20 BYN. Spravka: 80172899292"
+        val body =
+            "Priorbank. Karta 4***7405 26-01-2020 12:49:35. Zachislenie perevoda 100.00 USD. BLR ANDREI PAPKO. Dostupno: 292.20 BYN. Spravka: 80172899292"
         parser = PriorbankSmsParser(body)
 
         val result = parser.parse() as SmsData.SmsExchange
@@ -62,7 +63,8 @@ class PriorbankSmsParserTest {
 
     @Test
     fun parse_Get_cash() {
-        val body = "Priorbank. Karta 4***7405 02-02-2020 18:39:46. Nalichnye v bankomate 75.00 BYN. BLR ATM 675. Dostupno: 167.99 BYN. Spravka: 80172899292"
+        val body =
+            "Priorbank. Karta 4***7405 02-02-2020 18:39:46. Nalichnye v bankomate 75.00 BYN. BLR ATM 675. Dostupno: 167.99 BYN. Spravka: 80172899292"
         parser = PriorbankSmsParser(body)
 
         val result = parser.parse() as SmsData.SmsGetCash
@@ -78,10 +80,10 @@ class PriorbankSmsParserTest {
         val result = parser.parse()
     }
 
-
     @Test
     fun parse_spent() {
-        val body = "Priorbank. Karta 4***7405 21-08-2020 19:42:50. Oplata 140.94 BYN. BLR WWW.HIT.E-DOSTAVKA.BY. Dostupno: 233.77 BYN. Spravka: 80172899292"
+        val body =
+            "Priorbank. Karta 4***7405 21-08-2020 19:42:50. Oplata 140.94 BYN. BLR WWW.HIT.E-DOSTAVKA.BY. Dostupno: 233.77 BYN. Spravka: 80172899292"
         parser = PriorbankSmsParser(body)
 
         val result = parser.parse() as SmsData.SmsSpent
@@ -89,5 +91,19 @@ class PriorbankSmsParserTest {
         assertEquals(233.77, result.actualBalance, 0.0)
         assertEquals(140.94, result.spent, 0.0)
         assertEquals(Seller.Food, result.seller)
+    }
+
+    @Test
+    fun parse_spent2() {
+        val body =
+            "Priorbank. Karta 4***7405 27-09-2020 11:14:13. Oplata 6.84 BYN. BLR OPS GRODNO-20. Dostupno: 117.66 BYN. Spravka: 80172899292"
+        parser = PriorbankSmsParser(body)
+
+        val result = parser.parse() as SmsData.SmsSpent
+
+        assertEquals(117.66, result.actualBalance, 0.0)
+        assertEquals(6.84, result.spent, 0.0)
+        assertTrue(result.seller is Seller.Unknown)
+        assertEquals(". BLR OPS GRODNO-20.", result.seller.name)
     }
 }
