@@ -11,7 +11,7 @@ data class LogEntity(
         val spent: Double,
         val actualBalance: Double,
         val categoryBalance: Double,
-        val sellerText: String,
+        var sellerText: String,
         val timeInMillis: Long?,
         var isSellerResolved: Boolean
 )

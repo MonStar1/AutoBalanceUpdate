@@ -1,9 +1,9 @@
 package com.balance.update.autobalanceupdate.sms.seller
 
 sealed class Seller(val name: String, val shopsArray: Array<String>) {
-    class Unknown(val seller: String) : Seller(seller, emptyArray())
+    class Unknown(val sellerText: String) : Seller(sellerText, emptyArray())
     object Food : Seller(
-        "Food", arrayOf(
+        "Еда", arrayOf(
             "SOSEDI",
             "KORONA",
             "EVROOPT",
@@ -25,28 +25,28 @@ sealed class Seller(val name: String, val shopsArray: Array<String>) {
     )
 
     object Health : Seller(
-        "Health", arrayOf(
+        "Здоровье", arrayOf(
             "APTEKA",
             "SYNEVO"
         )
     )
 
     object Sweet : Seller(
-        "Sweet", arrayOf(
+        "Вкусняшки", arrayOf(
             "KRASNYY",
             "KIOSK"
         )
     )
 
     object Transport : Seller(
-        "Transport", arrayOf(
+        "Транспорт", arrayOf(
             "AZS",
             "Taxi"
         )
     )
 
     object Cafe : Seller(
-        "Cafe", arrayOf(
+        "Кафе и доставка", arrayOf(
             "GOGOPIZZA",
             "KFC",
             "KAFE",
@@ -60,10 +60,10 @@ sealed class Seller(val name: String, val shopsArray: Array<String>) {
         )
     )
 
-    object Household : Seller("Household", arrayOf("MILA"))
-    object Music : Seller("Music", arrayOf("MUSIC"))
+    object Household : Seller("Хоз. расходы", arrayOf("MILA"))
+    object Music : Seller("Музыка", arrayOf("MUSIC"))
     object Clothes : Seller(
-        "Clothes", arrayOf(
+        "Одежда", arrayOf(
             "COLINS",
             "GLORIA",
             "BELWEST"
@@ -71,11 +71,29 @@ sealed class Seller(val name: String, val shopsArray: Array<String>) {
     )
 
     object Child : Seller(
-        "Child", arrayOf(
+        "На малыша", arrayOf(
             "BUSLIK",
             "BEBIMARK",
             "PESOCHNICA",
             "PODGUZNIK"
+        )
+    )
+
+    object Fun : Seller(
+        "Развлечения", arrayOf(
+
+        )
+    )
+
+    object Gift : Seller(
+        "Подарки", arrayOf(
+
+        )
+    )
+
+    object Other : Seller(
+        "Непредвиденные расходы", arrayOf(
+
         )
     )
 }

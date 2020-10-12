@@ -94,7 +94,7 @@ class MtbankSmsParserTest {
 
         assertEquals(62.37, result.actualBalance, 6.90)
         assertEquals("""
-    fukdostavka, , MINSK""", (result.seller as Seller.Unknown).seller)
+    fukdostavka, , MINSK""", (result.seller as Seller.Unknown).sellerText)
     }
 
 }

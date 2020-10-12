@@ -169,6 +169,7 @@ class LogAdapter(var data: List<LogEntity>, val fragmentManager: FragmentManager
             } else {
                 BottomSheet {
                     item.seller = it.name
+                    item.sellerText = item.seller
                     item.isSellerResolved = true
 
                     Completable.fromAction { SmsResolver(app).resolveSeller(item.spent, it) }

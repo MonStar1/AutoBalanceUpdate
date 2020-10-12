@@ -40,16 +40,19 @@ class SmsResolver(val app: App) {
         const val FOOD_CELL = "C9"
         const val HEALTH_CELL = "C10"
         const val TRANSPORT_CELL = "C11"
-        const val SWEET_CELL = "C13"
-        const val CAFE_CELL = "C15"
+        const val SWEET_CELL = "C12"
+        const val CAFE_CELL = "C13"
         const val HOUSEHOLD_CELL = "C17"
-        const val CLOTHES_CELL = "C18"
-        const val CHILD_CELL = "C19"
-        const val MUSIC_CELL = "C21"
+        const val CLOTHES_CELL = "C14"
+        const val CHILD_CELL = "C15"
+        const val MUSIC_CELL = "C16"
+        const val FUN_CELL = "C18"
+        const val GIFT_CELL = "C19"
+        const val OTHER_CELL = "C20"
         const val CHANGED_USD_CELL = "C3"
         const val TO_SPEND_USD_CELL = "C4"
         const val CASH_CELL = "C7"
-        const val UNKNOWN_SELLER = "C26"
+        const val UNKNOWN_SELLER = "C21"
         const val ON_THE_CARD_USD_CELL = "B38"
         const val BALANCE_SPREADSHEET = "15NfMZvT2qDM8Xja1GnqumkNd8sIEgDM2XbMNaWkJocQ"
         const val BALANCE_SHEET = "Sheet_1"
@@ -114,7 +117,7 @@ class SmsResolver(val app: App) {
 
         val balanceCell = resolveSeller(smsSpent.spent, smsSpent.seller)
 
-        val sellerName = if (smsSpent.seller is Seller.Unknown) smsSpent.seller.seller else smsSpent.seller.name
+        val sellerName = if (smsSpent.seller is Unknown) smsSpent.seller.sellerText else smsSpent.seller.name
 
         runBlocking {
             app.datastore.edit {
@@ -196,7 +199,25 @@ class SmsResolver(val app: App) {
 
                 sheetsApi.updateCell(MUSIC_CELL, balanceCell)
             }
-            is Seller.Unknown -> {
+            is Seller.Gift -> {
+                val balance = sheetsApi.readCell(GIFT_CELL).toDouble()
+                balanceCell = balance - spent
+
+                sheetsApi.updateCell(GIFT_CELL, balanceCell)
+            }
+            is Seller.Fun -> {
+                val balance = sheetsApi.readCell(FUN_CELL).toDouble()
+                balanceCell = balance - spent
+
+                sheetsApi.updateCell(FUN_CELL, balanceCell)
+            }
+            is Seller.Other -> {
+                val balance = sheetsApi.readCell(OTHER_CELL).toDouble()
+                balanceCell = balance - spent
+
+                sheetsApi.updateCell(OTHER_CELL, balanceCell)
+            }
+            is Unknown -> {
                 val balance = sheetsApi.readCell(UNKNOWN_SELLER).toDouble()
                 balanceCell = balance - spent
 
