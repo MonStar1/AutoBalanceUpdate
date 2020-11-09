@@ -18,11 +18,15 @@ class PriorbankSmsParser(private val body: String) : SmsParser {
             }
             else -> {
                 var seller = parser.getSeller(body).first
-                if (seller is Seller.Unknown) {
-                    val flags = Pattern.CASE_INSENSITIVE or Pattern.DOTALL
-                    val matcher = Pattern.compile(".*BYN\\s*?(.+?)\\s*?Dostupno.*", flags).matcher(body)
-                    if (matcher.matches()) {
-                        seller = Seller.Unknown(matcher.group(1))
+
+                val flags = Pattern.CASE_INSENSITIVE or Pattern.DOTALL
+                val matcher = Pattern.compile(".*BYN\\s*?(.+?)\\s*?Dostupno.*", flags).matcher(body)
+                if (matcher.matches()) {
+                    val name = matcher.group(1).removePrefix("\n")
+                    if (seller is Seller.Unknown) {
+                        seller = Seller.Unknown(name)
+                    } else {
+                        seller.name = name
                     }
                 }
                 val spent = getSpent()

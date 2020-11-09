@@ -68,33 +68,42 @@ class MtbankSmsParserTest {
 
     @Test
     fun parse_7() {
-        parser = MtbankSmsParser("""KARTA:5351*1635
+        parser = MtbankSmsParser(
+            """KARTA:5351*1635
     16/08/18 12:46
     OPLATA 6.90 BYN
     WWW.HIT.E-DOSTAVKA.BY, , MINSK
     OSTATOK 62.37 BYN
-    Spr.:5099999""")
+    Spr.:5099999"""
+        )
 
         val result = parser.parse() as SmsData.SmsSpent
 
         assertEquals(62.37, result.actualBalance, 6.90)
         assertEquals(Seller.Food, result.seller)
+        assertEquals(
+            "\n" +
+                    "    WWW.HIT.E-DOSTAVKA.BY, , MINSK", result.seller.name
+        )
     }
 
     @Test
     fun parse_8() {
-        parser = MtbankSmsParser("""KARTA:5351*1635
+        parser = MtbankSmsParser(
+            """KARTA:5351*1635
     16/08/18 12:46
     OPLATA 6.90 BYN
     fukdostavka, , MINSK
     OSTATOK 62.37 BYN
-    Spr.:5099999""")
+    Spr.:5099999"""
+        )
 
         val result = parser.parse() as SmsData.SmsSpent
 
         assertEquals(62.37, result.actualBalance, 6.90)
-        assertEquals("""
-    fukdostavka, , MINSK""", (result.seller as Seller.Unknown).sellerText)
+        assertEquals(
+            """
+    fukdostavka, , MINSK""", (result.seller as Seller.Unknown).sellerText
+        )
     }
-
 }

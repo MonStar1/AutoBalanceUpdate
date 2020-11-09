@@ -48,10 +48,10 @@ class SmsResolver(val app: App) {
         const val MUSIC_CELL = "C16"
         const val FUN_CELL = "C18"
         const val GIFT_CELL = "C19"
-        const val OTHER_CELL = "C20"
+        const val UNEXPECTED_CELL = "C20"
         const val CHANGED_USD_CELL = "C3"
         const val TO_SPEND_USD_CELL = "C4"
-        const val CASH_CELL = "C7"
+        const val CASH_CELL = "F8"
         const val UNKNOWN_SELLER = "C21"
         const val ON_THE_CARD_USD_CELL = "B38"
         const val BALANCE_SPREADSHEET = "15NfMZvT2qDM8Xja1GnqumkNd8sIEgDM2XbMNaWkJocQ"
@@ -115,7 +115,7 @@ class SmsResolver(val app: App) {
             is SmsSender.Test -> Unit
         }
 
-        val balanceCell = resolveSeller(smsSpent.spent, smsSpent.seller)
+        val balanceCell = resolveSeller(smsSpent.spent, smsSpent.seller, false)
 
         val sellerName = if (smsSpent.seller is Unknown) smsSpent.seller.sellerText else smsSpent.seller.name
 
@@ -142,7 +142,7 @@ class SmsResolver(val app: App) {
             .subscribe()
     }
 
-    fun resolveSeller(spent: Double, seller: Seller): Double {
+    fun resolveSeller(spent: Double, seller: Seller, isFixResolve: Boolean): Double {
         var balanceCell = 0.0
         when (seller) {
             is Seller.Food -> {
@@ -211,11 +211,11 @@ class SmsResolver(val app: App) {
 
                 sheetsApi.updateCell(FUN_CELL, balanceCell)
             }
-            is Seller.Other -> {
-                val balance = sheetsApi.readCell(OTHER_CELL).toDouble()
+            is Seller.Unexpected -> {
+                val balance = sheetsApi.readCell(UNEXPECTED_CELL).toDouble()
                 balanceCell = balance - spent
 
-                sheetsApi.updateCell(OTHER_CELL, balanceCell)
+                sheetsApi.updateCell(UNEXPECTED_CELL, balanceCell)
             }
             is Unknown -> {
                 val balance = sheetsApi.readCell(UNKNOWN_SELLER).toDouble()
@@ -223,6 +223,11 @@ class SmsResolver(val app: App) {
 
                 sheetsApi.updateCell(UNKNOWN_SELLER, balanceCell)
             }
+        }
+
+        if (isFixResolve) {
+            val unknown = sheetsApi.readCell(UNKNOWN_SELLER).toDouble()
+            sheetsApi.updateCell(UNKNOWN_SELLER, unknown + spent)
         }
 
         return balanceCell

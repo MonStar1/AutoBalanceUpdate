@@ -9,7 +9,7 @@ import io.reactivex.Observable
 
 @Dao
 interface LogDao {
-    @Query("SELECT * FROM LogEntity ORDER BY id DESC")
+    @Query("SELECT * FROM LogEntity ORDER BY id DESC LIMIT 100")
     fun getAll(): Observable<List<LogEntity>>
 
     @Insert

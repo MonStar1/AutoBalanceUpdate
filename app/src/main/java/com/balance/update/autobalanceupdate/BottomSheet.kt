@@ -60,7 +60,7 @@ class BottomSheet(val onSelected: (Seller) -> Unit) : BottomSheetDialogFragment(
                     Seller.Gift,
                     Seller.Fun,
                     Seller.Music,
-                    Seller.Other
+                    Seller.Unexpected
                 )
             )
         }

@@ -7,7 +7,7 @@ import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -21,6 +21,7 @@ import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_main.progressBar
 import kotlinx.android.synthetic.main.content_main.mtbank
 import kotlinx.android.synthetic.main.content_main.openBattery
 import kotlinx.android.synthetic.main.content_main.prior
@@ -41,12 +42,20 @@ import kotlinx.coroutines.launch
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 import java.util.Date
-import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, EasyPermissions.RationaleCallbacks {
 
     lateinit var googleServiceAuth: GoogleServiceAuth
     private val composDisposable = CompositeDisposable()
+
+    private val logAdapter by lazy {
+        LogAdapter(
+            emptyList(),
+            supportFragmentManager,
+            application as App,
+            progressBar
+        )
+    }
 
     companion object {
 
@@ -58,6 +67,8 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
+
+        recyclerView.adapter = logAdapter
 
         recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL).apply {
             setDrawable(getDrawable(R.drawable.divider))
@@ -91,8 +102,10 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
         App.db.logDao().getAll()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { progressBar.visibility = View.VISIBLE }
+            .doOnNext { progressBar.visibility = View.GONE }
             .subscribe {
-                recyclerView.adapter = LogAdapter(it, supportFragmentManager, application as App)
+                logAdapter.update(it)
             }
             .apply { composDisposable.addAll(this) }
     }
@@ -152,7 +165,12 @@ class MainActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks, E
     }
 }
 
-class LogAdapter(var data: List<LogEntity>, val fragmentManager: FragmentManager, val app: App) :
+class LogAdapter(
+    var data: List<LogEntity>,
+    val fragmentManager: FragmentManager,
+    val app: App,
+    private val progressBar: ProgressBar
+) :
     RecyclerView.Adapter<LogAdapter.VH>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH =
@@ -168,14 +186,16 @@ class LogAdapter(var data: List<LogEntity>, val fragmentManager: FragmentManager
                 false
             } else {
                 BottomSheet {
-                    item.seller = it.name
                     item.sellerText = item.seller
+                    item.seller = it.name
                     item.isSellerResolved = true
 
-                    Completable.fromAction { SmsResolver(app).resolveSeller(item.spent, it) }
+                    Completable.fromAction { SmsResolver(app).resolveSeller(item.spent, it, true) }
                         .andThen { obs -> App.db.logDao().update(item).subscribe(obs) }
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
+                        .doOnSubscribe { progressBar.visibility = View.VISIBLE }
+                        .doFinally { progressBar.visibility = View.GONE }
                         .subscribe {}
 
                 }.show(fragmentManager, "")
@@ -195,6 +215,32 @@ class LogAdapter(var data: List<LogEntity>, val fragmentManager: FragmentManager
         }
 
         holder.itemView.setBackgroundResource(if (item.isSellerResolved) R.color.green_alpha else R.color.gray)
+    }
+
+    fun update(list: List<LogEntity>) {
+        data = list
+        notifyDataSetChanged()
+//        val oldList = data.toList()
+//        DiffUtil.calculateDiff(object : Callback() {
+//            override fun getOldListSize(): Int {
+//                return oldList.size
+//            }
+//
+//            override fun getNewListSize(): Int {
+//                return list.size
+//            }
+//
+//            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+//                return oldList[oldItemPosition].id == list[newItemPosition].id
+//            }
+//
+//            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+//                return oldList[oldItemPosition] == list[newItemPosition]
+//            }
+//        }).apply {
+//            data = list
+//            dispatchUpdatesTo(this@LogAdapter)
+//        }
     }
 
     class VH(view: View) : RecyclerView.ViewHolder(view)
