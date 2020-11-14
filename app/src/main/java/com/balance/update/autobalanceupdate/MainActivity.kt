@@ -29,8 +29,8 @@ import kotlinx.android.synthetic.main.content_main.recyclerView
 import kotlinx.android.synthetic.main.content_main.textView
 import kotlinx.android.synthetic.main.log_item.view.balance
 import kotlinx.android.synthetic.main.log_item.view.balanceCategory
-import kotlinx.android.synthetic.main.log_item.view.seller
-import kotlinx.android.synthetic.main.log_item.view.sellerText
+import kotlinx.android.synthetic.main.log_item.view.category
+import kotlinx.android.synthetic.main.log_item.view.sellerName
 import kotlinx.android.synthetic.main.log_item.view.sender
 import kotlinx.android.synthetic.main.log_item.view.spent
 import kotlinx.android.synthetic.main.log_item.view.time
@@ -186,7 +186,6 @@ class LogAdapter(
                 false
             } else {
                 BottomSheet {
-                    item.sellerText = item.seller
                     item.seller = it.name
                     item.isSellerResolved = true
 
@@ -203,12 +202,12 @@ class LogAdapter(
             }
         }
 
-        holder.itemView.seller.text = item.seller
+        holder.itemView.category.text = item.seller
         holder.itemView.sender.text = item.sender
         holder.itemView.spent.text = item.spent.toString()
         holder.itemView.balance.text = item.actualBalance.toString()
         holder.itemView.balanceCategory.text = item.categoryBalance.toString()
-        holder.itemView.sellerText.text = item.sellerText
+        holder.itemView.sellerName.text = item.sellerText
         item.timeInMillis?.let {
             holder.itemView.time.text = DateFormat.getLongDateFormat(holder.itemView.context)
                 .format(Date(it)) + " " + DateFormat.getTimeFormat(holder.itemView.context).format(Date(it))

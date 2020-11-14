@@ -1,7 +1,7 @@
 package com.balance.update.autobalanceupdate.sms.parser
 
 import com.balance.update.autobalanceupdate.sms.SmsSender
-import com.balance.update.autobalanceupdate.sms.seller.Seller
+import com.balance.update.autobalanceupdate.sms.category.Category
 import java.util.regex.Pattern
 
 interface SmsParser {
@@ -22,7 +22,13 @@ interface SmsParser {
 }
 
 sealed class SmsData {
-    data class SmsSpent(val sender: SmsSender, val seller: Seller, val spent: Double, val actualBalance: Double) : SmsData()
+    data class SmsSpent(
+        val sender: SmsSender,
+        val category: Category,
+        val spent: Double,
+        val actualBalance: Double,
+        val sellerName: String
+    ) : SmsData()
 
     data class SmsExchange(val sender: SmsSender, val exchangedUSD: Double, val actualBalance: Double) : SmsData()
 

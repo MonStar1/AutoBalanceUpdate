@@ -1,8 +1,8 @@
-package com.balance.update.autobalanceupdate.sms.seller
+package com.balance.update.autobalanceupdate.sms.category
 
-sealed class Seller(var name: String, val shopsArray: Array<String>) {
-    class Unknown(val sellerText: String) : Seller(sellerText, emptyArray())
-    object Food : Seller(
+sealed class Category(val name: String, val shopsArray: Array<String>) {
+    class Unknown(val sellerText: String) : Category(sellerText, emptyArray())
+    object Food : Category(
         "Еда", arrayOf(
             "SOSEDI",
             "KORONA",
@@ -24,28 +24,28 @@ sealed class Seller(var name: String, val shopsArray: Array<String>) {
         )
     )
 
-    object Health : Seller(
+    object Health : Category(
         "Здоровье", arrayOf(
             "APTEKA",
             "SYNEVO"
         )
     )
 
-    object Sweet : Seller(
+    object Sweet : Category(
         "Вкусняшки", arrayOf(
             "KRASNYY",
             "KIOSK"
         )
     )
 
-    object Transport : Seller(
+    object Transport : Category(
         "Транспорт", arrayOf(
             "AZS",
             "Taxi"
         )
     )
 
-    object Cafe : Seller(
+    object Cafe : Category(
         "Кафе и доставка", arrayOf(
             "GOGOPIZZA",
             "KFC",
@@ -60,9 +60,9 @@ sealed class Seller(var name: String, val shopsArray: Array<String>) {
         )
     )
 
-    object Household : Seller("Хоз. расходы", arrayOf("MILA"))
-    object Music : Seller("Музыка", arrayOf("MUSIC"))
-    object Clothes : Seller(
+    object Household : Category("Хоз. расходы", arrayOf("MILA"))
+    object Music : Category("Музыка", arrayOf("MUSIC"))
+    object Clothes : Category(
         "Одежда", arrayOf(
             "COLINS",
             "GLORIA",
@@ -70,7 +70,7 @@ sealed class Seller(var name: String, val shopsArray: Array<String>) {
         )
     )
 
-    object Child : Seller(
+    object Child : Category(
         "На малыша", arrayOf(
             "BUSLIK",
             "BEBIMARK",
@@ -79,19 +79,19 @@ sealed class Seller(var name: String, val shopsArray: Array<String>) {
         )
     )
 
-    object Fun : Seller(
+    object Fun : Category(
         "Развлечения", arrayOf(
 
         )
     )
 
-    object Gift : Seller(
+    object Gift : Category(
         "Подарки", arrayOf(
 
         )
     )
 
-    object Unexpected : Seller(
+    object Unexpected : Category(
         "Непредвиденные расходы", arrayOf(
 
         )

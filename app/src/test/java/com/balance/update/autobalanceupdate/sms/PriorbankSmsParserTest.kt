@@ -3,7 +3,7 @@ package com.balance.update.autobalanceupdate.sms
 import com.balance.update.autobalanceupdate.sms.parser.PriorbankSmsParser
 import com.balance.update.autobalanceupdate.sms.parser.SmsData
 import com.balance.update.autobalanceupdate.sms.parser.SmsParseException
-import com.balance.update.autobalanceupdate.sms.seller.Seller
+import com.balance.update.autobalanceupdate.sms.category.Category
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -90,7 +90,7 @@ class PriorbankSmsParserTest {
 
         assertEquals(233.77, result.actualBalance, 0.0)
         assertEquals(140.94, result.spent, 0.0)
-        assertEquals(Seller.Food, result.seller)
+        assertEquals(Category.Food, result.category)
     }
 
     @Test
@@ -103,7 +103,7 @@ class PriorbankSmsParserTest {
 
         assertEquals(117.66, result.actualBalance, 0.0)
         assertEquals(6.84, result.spent, 0.0)
-        assertTrue(result.seller is Seller.Unknown)
-        assertEquals(". BLR OPS GRODNO-20.", result.seller.name)
+        assertTrue(result.category is Category.Unknown)
+        assertEquals(". BLR OPS GRODNO-20.", result.sellerName)
     }
 }

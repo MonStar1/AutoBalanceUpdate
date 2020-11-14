@@ -3,7 +3,7 @@ package com.balance.update.autobalanceupdate.sms
 import com.balance.update.autobalanceupdate.sms.parser.MtbankSmsParser
 import com.balance.update.autobalanceupdate.sms.parser.SmsData
 import com.balance.update.autobalanceupdate.sms.parser.SmsParseException
-import com.balance.update.autobalanceupdate.sms.seller.Seller
+import com.balance.update.autobalanceupdate.sms.category.Category
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -80,11 +80,9 @@ class MtbankSmsParserTest {
         val result = parser.parse() as SmsData.SmsSpent
 
         assertEquals(62.37, result.actualBalance, 6.90)
-        assertEquals(Seller.Food, result.seller)
-        assertEquals(
-            "\n" +
-                    "    WWW.HIT.E-DOSTAVKA.BY, , MINSK", result.seller.name
-        )
+        assertEquals(Category.Food, result.category)
+        assertEquals(Category.Food.name, "Еда")
+        assertEquals("    WWW.HIT.E-DOSTAVKA.BY, , MINSK", result.sellerName)
     }
 
     @Test
@@ -101,9 +99,6 @@ class MtbankSmsParserTest {
         val result = parser.parse() as SmsData.SmsSpent
 
         assertEquals(62.37, result.actualBalance, 6.90)
-        assertEquals(
-            """
-    fukdostavka, , MINSK""", (result.seller as Seller.Unknown).sellerText
-        )
+        assertEquals("""    fukdostavka, , MINSK""", (result.category as Category.Unknown).sellerText)
     }
 }

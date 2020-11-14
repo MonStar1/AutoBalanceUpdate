@@ -1,18 +1,18 @@
 package com.balance.update.autobalanceupdate.sms.parser
 
-import com.balance.update.autobalanceupdate.sms.seller.Seller
+import com.balance.update.autobalanceupdate.sms.category.Category
 import org.junit.Assert.*
 import org.junit.Test
 
 class SellerParserTest {
 
-    private val sellerParser = SellerParser("OPLATA", "BYN");
+    private val sellerParser = CategoryParser("OPLATA", "BYN");
 
     @Test
     fun testUnknown() {
-        val seller = sellerParser.getSeller("WTF BYN")
+        val seller = sellerParser.getCategory("WTF BYN")
 
-        assertTrue(seller.first is Seller.Unknown)
+        assertTrue(seller.first is Category.Unknown)
     }
 
     @Test
@@ -24,9 +24,9 @@ PT CT "KORONA", , MINSK
 OSTATOK 123.39 BYN
 Spr.:5099999"""
 
-        val seller = sellerParser.getSeller(body)
+        val seller = sellerParser.getCategory(body)
 
-        assertTrue(seller.first is Seller.Food)
+        assertTrue(seller.first is Category.Food)
     }
 
     @Test
@@ -38,9 +38,9 @@ PT SHOP APTEKA N1 GRODNO BY
 OSTATOK 2.03BYN
 Spr.:5099999"""
 
-        val seller = sellerParser.getSeller(body)
+        val seller = sellerParser.getCategory(body)
 
-        assertTrue(seller.first is Seller.Health)
+        assertTrue(seller.first is Category.Health)
     }
 
     @Test
@@ -52,9 +52,9 @@ SUP AZS N1 GRODNO BY
 OSTATOK 2.03BYN
 Spr.:5099999"""
 
-        val seller = sellerParser.getSeller(body)
+        val seller = sellerParser.getCategory(body)
 
-        assertTrue(seller.first is Seller.Transport)
+        assertTrue(seller.first is Category.Transport)
     }
 
     @Test
@@ -66,8 +66,8 @@ SHOP"WWW.GOGOPIZZA.BY" / GRODNO / BY
 OSTATOK 225.78 BYN
 Spr.:5099999"""
 
-        val seller = sellerParser.getSeller(body)
+        val seller = sellerParser.getCategory(body)
 
-        assertTrue(seller.first is Seller.Cafe)
+        assertTrue(seller.first is Category.Cafe)
     }
 }

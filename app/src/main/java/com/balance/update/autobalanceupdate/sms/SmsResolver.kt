@@ -8,8 +8,8 @@ import com.balance.update.autobalanceupdate.room.LogEntity
 import com.balance.update.autobalanceupdate.sheets.SheetsApi
 import com.balance.update.autobalanceupdate.sms.SmsSender.PriorBank
 import com.balance.update.autobalanceupdate.sms.parser.SmsData
-import com.balance.update.autobalanceupdate.sms.seller.Seller
-import com.balance.update.autobalanceupdate.sms.seller.Seller.Unknown
+import com.balance.update.autobalanceupdate.sms.category.Category
+import com.balance.update.autobalanceupdate.sms.category.Category.Unknown
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
 import com.google.api.client.util.ExponentialBackOff
@@ -115,9 +115,9 @@ class SmsResolver(val app: App) {
             is SmsSender.Test -> Unit
         }
 
-        val balanceCell = resolveSeller(smsSpent.spent, smsSpent.seller, false)
+        val balanceCell = resolveSeller(smsSpent.spent, smsSpent.category, false)
 
-        val sellerName = if (smsSpent.seller is Unknown) smsSpent.seller.sellerText else smsSpent.seller.name
+        val categoryName = if (smsSpent.category is Unknown) smsSpent.sellerName else smsSpent.category.name
 
         runBlocking {
             app.datastore.edit {
@@ -132,86 +132,86 @@ class SmsResolver(val app: App) {
         App.db.logDao()
             .insert(
                 LogEntity(
-                    sender = smsSpent.sender.name, seller = sellerName,
+                    sender = smsSpent.sender.name, seller = categoryName,
                     actualBalance = smsSpent.actualBalance, spent = smsSpent.spent,
-                    categoryBalance = balanceCell, sellerText = "Потрачено",
-                    timeInMillis = timeMillis, isSellerResolved = smsSpent.seller !is Unknown
+                    categoryBalance = balanceCell, sellerText = smsSpent.sellerName,
+                    timeInMillis = timeMillis, isSellerResolved = smsSpent.category !is Unknown
                 )
             )
             .subscribeOn(Schedulers.io())
             .subscribe()
     }
 
-    fun resolveSeller(spent: Double, seller: Seller, isFixResolve: Boolean): Double {
+    fun resolveSeller(spent: Double, category: Category, isFixResolve: Boolean): Double {
         var balanceCell = 0.0
-        when (seller) {
-            is Seller.Food -> {
+        when (category) {
+            is Category.Food -> {
                 val balance = sheetsApi.readCell(FOOD_CELL).toDouble()
                 balanceCell = balance - spent
 
                 sheetsApi.updateCell(FOOD_CELL, balanceCell)
             }
-            is Seller.Health -> {
+            is Category.Health -> {
                 val balance = sheetsApi.readCell(HEALTH_CELL).toDouble()
                 balanceCell = balance - spent
 
                 sheetsApi.updateCell(HEALTH_CELL, balanceCell)
             }
-            is Seller.Transport -> {
+            is Category.Transport -> {
                 val balance = sheetsApi.readCell(TRANSPORT_CELL).toDouble()
                 balanceCell = balance - spent
 
                 sheetsApi.updateCell(TRANSPORT_CELL, balanceCell)
             }
-            is Seller.Sweet -> {
+            is Category.Sweet -> {
                 val balance = sheetsApi.readCell(SWEET_CELL).toDouble()
                 balanceCell = balance - spent
 
                 sheetsApi.updateCell(SWEET_CELL, balanceCell)
             }
-            is Seller.Cafe -> {
+            is Category.Cafe -> {
                 val balance = sheetsApi.readCell(CAFE_CELL).toDouble()
                 balanceCell = balance - spent
 
                 sheetsApi.updateCell(CAFE_CELL, balanceCell)
             }
-            is Seller.Household -> {
+            is Category.Household -> {
                 val balance = sheetsApi.readCell(HOUSEHOLD_CELL).toDouble()
                 balanceCell = balance - spent
 
                 sheetsApi.updateCell(HOUSEHOLD_CELL, balanceCell)
             }
-            is Seller.Clothes -> {
+            is Category.Clothes -> {
                 val balance = sheetsApi.readCell(CLOTHES_CELL).toDouble()
                 balanceCell = balance - spent
 
                 sheetsApi.updateCell(CLOTHES_CELL, balanceCell)
             }
-            is Seller.Child -> {
+            is Category.Child -> {
                 val balance = sheetsApi.readCell(CHILD_CELL).toDouble()
                 balanceCell = balance - spent
 
                 sheetsApi.updateCell(CHILD_CELL, balanceCell)
             }
-            is Seller.Music -> {
+            is Category.Music -> {
                 val balance = sheetsApi.readCell(MUSIC_CELL).toDouble()
                 balanceCell = balance - spent
 
                 sheetsApi.updateCell(MUSIC_CELL, balanceCell)
             }
-            is Seller.Gift -> {
+            is Category.Gift -> {
                 val balance = sheetsApi.readCell(GIFT_CELL).toDouble()
                 balanceCell = balance - spent
 
                 sheetsApi.updateCell(GIFT_CELL, balanceCell)
             }
-            is Seller.Fun -> {
+            is Category.Fun -> {
                 val balance = sheetsApi.readCell(FUN_CELL).toDouble()
                 balanceCell = balance - spent
 
                 sheetsApi.updateCell(FUN_CELL, balanceCell)
             }
-            is Seller.Unexpected -> {
+            is Category.Unexpected -> {
                 val balance = sheetsApi.readCell(UNEXPECTED_CELL).toDouble()
                 balanceCell = balance - spent
 

@@ -1,12 +1,12 @@
 package com.balance.update.autobalanceupdate.sms.parser
 
 import com.balance.update.autobalanceupdate.sms.SmsSender
-import com.balance.update.autobalanceupdate.sms.seller.Seller
+import com.balance.update.autobalanceupdate.sms.category.Category
 import java.util.regex.Pattern
 
 class PriorbankSmsParser(private val body: String) : SmsParser {
 
-    private val parser = SellerParser("Oplata", "BYN\\S")
+    private val parser = CategoryParser("Oplata", "BYN\\S")
 
     override fun parse(): SmsData {
         return when {
@@ -17,20 +17,22 @@ class PriorbankSmsParser(private val body: String) : SmsParser {
                 SmsData.SmsGetCash(SmsSender.PriorBank(), getCash(), getActualBalance())
             }
             else -> {
-                var seller = parser.getSeller(body).first
+                var category = parser.getCategory(body).first
 
                 val flags = Pattern.CASE_INSENSITIVE or Pattern.DOTALL
                 val matcher = Pattern.compile(".*BYN\\s*?(.+?)\\s*?Dostupno.*", flags).matcher(body)
+                val sellerName: String
                 if (matcher.matches()) {
-                    val name = matcher.group(1).removePrefix("\n")
-                    if (seller is Seller.Unknown) {
-                        seller = Seller.Unknown(name)
-                    } else {
-                        seller.name = name
+                    sellerName = matcher.group(1).removePrefix("\n")
+                    if (category is Category.Unknown) {
+                        category = Category.Unknown(sellerName)
                     }
+                } else {
+                    sellerName = "Unknown"
+                    category = Category.Unknown(sellerName)
                 }
                 val spent = getSpent()
-                SmsData.SmsSpent(SmsSender.PriorBank(), seller, spent, getActualBalance())
+                SmsData.SmsSpent(SmsSender.PriorBank(), category, spent, getActualBalance(), sellerName)
             }
         }
     }

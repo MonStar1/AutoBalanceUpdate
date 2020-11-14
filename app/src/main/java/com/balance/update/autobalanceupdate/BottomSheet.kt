@@ -8,11 +8,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil.ItemCallback
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.balance.update.autobalanceupdate.sms.seller.Seller
+import com.balance.update.autobalanceupdate.sms.category.Category
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.bottomsheet.recyclerView
 
-class BottomSheet(val onSelected: (Seller) -> Unit) : BottomSheetDialogFragment() {
+class BottomSheet(val onSelected: (Category) -> Unit) : BottomSheetDialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.bottomsheet, container, false)
@@ -20,12 +20,12 @@ class BottomSheet(val onSelected: (Seller) -> Unit) : BottomSheetDialogFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        recyclerView.adapter = object : ListAdapter<Seller, ViewHolder>(object : ItemCallback<Seller>() {
-            override fun areItemsTheSame(oldItem: Seller, newItem: Seller): Boolean {
+        recyclerView.adapter = object : ListAdapter<Category, ViewHolder>(object : ItemCallback<Category>() {
+            override fun areItemsTheSame(oldItem: Category, newItem: Category): Boolean {
                 return oldItem == newItem
             }
 
-            override fun areContentsTheSame(oldItem: Seller, newItem: Seller): Boolean {
+            override fun areContentsTheSame(oldItem: Category, newItem: Category): Boolean {
                 return oldItem == newItem
             }
         }) {
@@ -49,18 +49,18 @@ class BottomSheet(val onSelected: (Seller) -> Unit) : BottomSheetDialogFragment(
         }.apply {
             submitList(
                 listOf(
-                    Seller.Food,
-                    Seller.Health,
-                    Seller.Sweet,
-                    Seller.Transport,
-                    Seller.Cafe,
-                    Seller.Household,
-                    Seller.Clothes,
-                    Seller.Child,
-                    Seller.Gift,
-                    Seller.Fun,
-                    Seller.Music,
-                    Seller.Unexpected
+                    Category.Food,
+                    Category.Health,
+                    Category.Sweet,
+                    Category.Transport,
+                    Category.Cafe,
+                    Category.Household,
+                    Category.Clothes,
+                    Category.Child,
+                    Category.Gift,
+                    Category.Fun,
+                    Category.Music,
+                    Category.Unexpected
                 )
             )
         }
